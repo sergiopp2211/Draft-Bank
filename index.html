@@ -3,91 +3,129 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Draft-Bank | Web Oficial</title>
+    <title>Draft-Bank Official Web</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
         :root { --fifa-blue: #00051a; --fifa-neon: #00ffcc; --fifa-card: #1a1f3c; }
-        body { background-color: var(--fifa-blue); color: white; font-family: 'Roboto', sans-serif; padding-bottom: 50px; }
-        h2 { font-family: 'Orbitron', sans-serif; color: var(--fifa-neon); margin-bottom: 20px; text-align: center; }
+        body { background-color: var(--fifa-blue); color: white; font-family: 'Roboto', sans-serif; padding-top: 70px; }
         
-        /* Navbar y Pestañas */
-        .navbar { background: rgba(0, 0, 0, 0.9); border-bottom: 2px solid var(--fifa-neon); }
-        .nav-pills .nav-link { color: white; font-family: 'Orbitron', sans-serif; border-radius: 0; border-bottom: 2px solid transparent; }
-        .nav-pills .nav-link.active { background-color: transparent; border-bottom: 2px solid var(--fifa-neon); color: var(--fifa-neon); }
+        /* Navbar Superior Fija */
+        .navbar { background: rgba(0, 0, 0, 0.95); border-bottom: 2px solid var(--fifa-neon); }
+        .nav-link { color: white !important; font-family: 'Orbitron', sans-serif; font-size: 0.8rem; text-transform: uppercase; cursor: pointer; }
+        .nav-link:hover { color: var(--fifa-neon) !important; }
+        .nav-link.active { color: var(--fifa-neon) !important; font-weight: bold; border-bottom: 2px solid var(--fifa-neon); }
+
+        .container { max-width: 900px; }
+        .card-stats { background: var(--fifa-card); border: 1px solid #333; border-radius: 15px; padding: 20px; margin-bottom: 20px; }
+        h2 { font-family: 'Orbitron', sans-serif; color: var(--fifa-neon); font-size: 1.5rem; margin-bottom: 20px; }
         
-        .card-stats { background: var(--fifa-card); border: 1px solid #333; border-radius: 15px; padding: 20px; margin-top: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        /* Estilos de Tablas */
         .table { color: white; border-color: #444; }
         .pichichi-rank { color: var(--fifa-neon); font-weight: bold; }
-        .noticia-item { border-left: 4px solid var(--fifa-neon); background: rgba(255,255,255,0.05); padding: 15px; margin-bottom: 10px; border-radius: 0 10px 10px 0; }
+        
+        /* Noticias y Calendario */
+        .item-box { background: rgba(255,255,255,0.05); border-left: 4px solid var(--fifa-neon); padding: 15px; margin-bottom: 15px; border-radius: 5px; }
+        .vs { color: var(--fifa-neon); font-weight: bold; padding: 0 10px; }
+
+        /* Ocultar secciones por defecto */
+        .seccion-contenido { display: none; }
+        .seccion-contenido.activa { display: block; animation: fadeIn 0.5s; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
 
-<nav class="navbar sticky-top">
-    <div class="container justify-content-center">
-        <ul class="nav nav-pills" id="pills-tab" role="tablist">
-            <li class="nav-item"><button class="nav-link active" data-bs-toggle="pill" data-bs-target="#f1">1ª Div</button></li>
-            <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#f2">F2 (2ª)</button></li>
-            <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#rankings">Rankings</button></li>
-            <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#calendario">Calendario</button></li>
-            <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#normas">Normas</button></li>
-        </ul>
+<nav class="navbar navbar-expand-lg fixed-top navbar-dark">
+    <div class="container">
+        <a class="navbar-brand" href="#" style="font-family: 'Orbitron'; color: var(--fifa-neon);">DB</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link active" onclick="mostrarSeccion('f1', this)">1ª Div</a></li>
+                <li class="nav-item"><a class="nav-link" onclick="mostrarSeccion('f2', this)">F2</a></li>
+                <li class="nav-item"><a class="nav-link" onclick="mostrarSeccion('rankings', this)">Rankings</a></li>
+                <li class="nav-item"><a class="nav-link" onclick="mostrarSeccion('calendario', this)">Calendario</a></li>
+                <li class="nav-item"><a class="nav-link" onclick="mostrarSeccion('normas', this)">Normas</a></li>
+            </ul>
+        </div>
     </div>
 </nav>
 
-<div class="container mt-3">
-    <div class="tab-content" id="pills-tabContent">
-        
-        <div class="tab-pane fade show active" id="f1">
-            <div class="card-stats">
-                <h2>CLASIFICACIÓN 1ª DIVISIÓN</h2>
-                <div class="table-responsive"><table class="table"><thead><tr><th>#</th><th>Equipo</th><th>J</th><th>Pts</th></tr></thead><tbody id="tabla-f1"></tbody></table></div>
+<div class="container mt-4">
+
+    <div id="f1" class="seccion-contenido activa">
+        <div class="card-stats">
+            <h2>CLASIFICACIÓN 1ª DIVISIÓN</h2>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead><tr><th>#</th><th>Equipo</th><th>J</th><th>Pts</th></tr></thead>
+                    <tbody id="tabla-f1"></tbody>
+                </table>
             </div>
         </div>
-
-        <div class="tab-pane fade" id="f2">
-            <div class="card-stats">
-                <h2>CLASIFICACIÓN F2</h2>
-                <div class="table-responsive"><table class="table"><thead><tr><th>#</th><th>Equipo</th><th>J</th><th>Pts</th></tr></thead><tbody id="tabla-f2"></tbody></table></div>
-            </div>
-        </div>
-
-        <div class="tab-pane fade" id="rankings">
-            <div class="card-stats">
-                <h2>MÁXIMOS GOLEADORES</h2>
-                <div id="lista-goleadores"></div>
-            </div>
-        </div>
-
-        <div class="tab-pane fade" id="calendario">
-            <div class="card-stats text-center">
-                <h2>PRÓXIMA JORNADA</h2>
-                <div class="p-3 border mb-2">Real de Madrid vs Obolskin Club (Lunes 22:00)</div>
-                <div class="p-3 border mb-2">Er Málaga CF vs Cara al Sol (Lunes 22:30)</div>
-            </div>
-        </div>
-
-        <div class="tab-pane fade" id="normas">
-            <div class="card-stats">
-                <h2>NOTICIAS</h2>
-                <div class="noticia-item"><h5>¡Fichaje Bomba!</h5><p>Mbappé llega a Obolskin Club para reforzar la delantera.</p></div>
-                <div class="noticia-item"><h5>Nueva Norma</h5><p>Los partidos de F2 se jugarán obligatoriamente los martes.</p></div>
-                <h2 class="mt-4">NORMAS DE LA LIGA</h2>
-                <ul>
-                    <li>Respeto total a los rivales.</li>
-                    <li>Subir captura al grupo de WhatsApp al terminar.</li>
-                    <li>Si hay lag, pausar el partido en el minuto 5.</li>
-                </ul>
-            </div>
-        </div>
-
     </div>
+
+    <div id="f2" class="seccion-contenido">
+        <div class="card-stats">
+            <h2>CLASIFICACIÓN F2 (2ª DIV)</h2>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead><tr><th>#</th><th>Equipo</th><th>J</th><th>Pts</th></tr></thead>
+                    <tbody id="tabla-f2"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="rankings" class="seccion-contenido">
+        <div class="card-stats">
+            <h2>TOP GOLEADORES 🔥</h2>
+            <div id="lista-goleadores"></div>
+        </div>
+    </div>
+
+    <div id="calendario" class="seccion-contenido">
+        <div class="card-stats">
+            <h2>PRÓXIMOS PARTIDOS</h2>
+            <div class="item-box">
+                <div class="text-center">
+                    <span>Real de Madrid</span> <span class="vs">VS</span> <span>Obolskin Club</span>
+                    <br><small class="text-muted">Lunes - 22:00h</small>
+                </div>
+            </div>
+            <div class="item-box text-center">
+                <span>Er Málaga CF</span> <span class="vs">VS</span> <span>Cara al Sol</span>
+                <br><small class="text-muted">Lunes - 22:30h</small>
+            </div>
+        </div>
+    </div>
+
+    <div id="normas" class="seccion-contenido">
+        <div class="card-stats">
+            <h2>NOTICIAS DE LA SEMANA</h2>
+            <div class="item-box">
+                <h5>¡Nuevo Líder en F2!</h5>
+                <p>La competición se aprieta en la segunda división tras los resultados del domingo.</p>
+            </div>
+            <h2 class="mt-4">REGLAMENTO</h2>
+            <ul>
+                <li>Captura de pantalla obligatoria al finalizar.</li>
+                <li>Máximo 10 minutos de cortesía para presentarse al partido.</li>
+                <li>Prohibido insultos o toxicidad en el chat.</li>
+            </ul>
+        </div>
+    </div>
+
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    const equiposF1 = [
+    // DATOS DE LA LIGA (Cámbialos aquí)
+    const datosF1 = [
         { n: "Obolskin Club", j: 20, pts: 44 },
         { n: "Er Málaga CF", j: 19, pts: 42 },
         { n: "Cara al Sol", j: 19, pts: 38 },
@@ -101,35 +139,55 @@
         { n: "Salamanca", j: 17, pts: 1 }
     ];
 
-    const equiposF2 = [
-        { n: "Equipo F2 Uno", j: 5, pts: 12 },
-        { n: "Equipo F2 Dos", j: 5, pts: 10 }
+    const datosF2 = [
+        { n: "Equipo Ejemplo 1", j: 10, pts: 25 },
+        { n: "Equipo Ejemplo 2", j: 10, pts: 20 }
     ];
 
-    const goleadores = [
-        { nombre: "Mbappé", goles: 24, equipo: "Obolskin" },
-        { nombre: "Haaland", goles: 19, equipo: "Er Mála" }
+    const datosPichichi = [
+        { n: "Mbappé", e: "Obolskin", g: 24 },
+        { n: "Haaland", e: "Er Mála", g: 19 }
     ];
 
-    function cargarTablas() {
+    function mostrarSeccion(id, link) {
+        // Ocultar todas las secciones
+        document.querySelectorAll('.seccion-contenido').forEach(sec => sec.classList.remove('activa'));
+        // Quitar 'active' de todos los links
+        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+        
+        // Mostrar la elegida
+        document.getElementById(id).classList.add('activa');
+        link.classList.add('active');
+
+        // Cerrar menú en móviles tras pinchar
+        const navbarCollapse = document.getElementById('navbarNav');
+        if (navbarCollapse.classList.contains('show')) {
+            new bootstrap.Collapse(navbarCollapse).hide();
+        }
+    }
+
+    function cargarDatos() {
         const t1 = document.getElementById('tabla-f1');
         const t2 = document.getElementById('tabla-f2');
-        const rg = document.getElementById('lista-goleadores');
+        const listG = document.getElementById('lista-goleadores');
 
-        equiposF1.sort((a,b) => b.pts - a.pts).forEach((eq, i) => {
+        datosF1.sort((a,b) => b.pts - a.pts).forEach((eq, i) => {
             t1.innerHTML += `<tr><td>${i+1}</td><td>${eq.n}</td><td>${eq.j}</td><td class="pichichi-rank">${eq.pts}</td></tr>`;
         });
 
-        equiposF2.sort((a,b) => b.pts - a.pts).forEach((eq, i) => {
+        datosF2.sort((a,b) => b.pts - a.pts).forEach((eq, i) => {
             t2.innerHTML += `<tr><td>${i+1}</td><td>${eq.n}</td><td>${eq.j}</td><td class="pichichi-rank">${eq.pts}</td></tr>`;
         });
 
-        goleadores.forEach(j => {
-            rg.innerHTML += `<div class="d-flex justify-content-between border-bottom py-2"><span>${j.nombre}</span><span class="pichichi-rank">${j.goles} Goles</span></div>`;
+        datosPichichi.forEach(p => {
+            listG.innerHTML += `<div class="d-flex justify-content-between border-bottom py-2">
+                <span>${p.n} <small class="text-muted">(${p.e})</small></span>
+                <span class="pichichi-rank">${p.g} Goles</span>
+            </div>`;
         });
     }
 
-    window.onload = cargarTablas;
+    window.onload = cargarDatos;
 </script>
 </body>
 </html>
