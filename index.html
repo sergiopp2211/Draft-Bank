@@ -184,17 +184,23 @@
     function cargarTodo() {
         const drawL = (list, id) => {
             const table = document.getElementById(id);
+            if (!table) return; // Seguridad por si no encuentra la tabla
+            table.innerHTML = ""; // Para que no se dupliquen al recargar
             list.forEach((eq, i) => {
                 table.innerHTML += `<tr class="clickable-team" onclick="verEquipo('${eq.n}')">
                     <td>${i+1}</td>
-                    <td class="d-flex align-items-center"><img src="${eq.img}" class="shield-mini"> ${eq.n}</td>
+                    <td class="d-flex align-items-center">
+                        <img src="${eq.img}" class="shield-mini" style="width:25px; height:25px; margin-right:10px;"> 
+                        ${eq.n}
+                    </td>
                     <td>${eq.pj}</td><td>${eq.g}</td><td>${eq.e}</td><td>${eq.p}</td><td>${eq.dif}</td>
                     <td class="pts-bold">${eq.pts}</td>
                 </tr>`;
             });
         };
-        drawL(liga1, 'body-l1'); drawL(liga2, 'body-l2');
-
+        drawL(liga1, 'body-l1'); 
+        drawL(liga2, 'body-l2');
+        
         const gList = document.getElementById('stats-goles');
         const aList = document.getElementById('stats-asist');
         const amaList = document.getElementById('stats-ama');
