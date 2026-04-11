@@ -3,65 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DraftBank League | Pro Management</title>
+    <title>DraftBank League | Pro Official</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
-        :root { --neon: #00ffcc; --bg: #050811; --card: #111628; --yellow: #ffcc00; --red: #ff4d4d; }
-        body { background-color: var(--bg); color: white; font-family: 'Roboto', sans-serif; overflow-x: hidden; }
-        h1, h2, h3, .nav-link { font-family: 'Orbitron', sans-serif; text-transform: uppercase; }
+        :root { --neon: #00ffcc; --bg: #050811; --card: #111628; --text-muted: #888; }
+        body { background-color: var(--bg); color: white; font-family: 'Roboto', sans-serif; }
+        h2, h3, .nav-link { font-family: 'Orbitron', sans-serif; text-transform: uppercase; }
         
-        /* Navbar & Tabs */
-        .navbar { background: #000; border-bottom: 2px solid var(--neon); box-shadow: 0 4px 20px rgba(0, 255, 204, 0.2); }
-        .nav-tabs { border: none; flex-wrap: nowrap; overflow-x: auto; padding-bottom: 10px; }
-        .nav-tabs::-webkit-scrollbar { height: 5px; }
-        .nav-tabs .nav-link { color: #888; border: none; background: #1a2035; margin-right: 8px; border-radius: 8px; white-space: nowrap; transition: 0.3s; }
-        .nav-tabs .nav-link.active { background: var(--neon); color: #000; font-weight: bold; box-shadow: 0 0 15px var(--neon); }
-        
-        /* Cards & Tables */
-        .card-stats { background: var(--card); border-radius: 15px; padding: 25px; margin-bottom: 25px; border: 1px solid #252d47; }
+        .navbar { background: #000; border-bottom: 2px solid var(--neon); padding: 1rem; }
+        .nav-tabs { border: none; justify-content: center; gap: 10px; margin-bottom: 30px; }
+        .nav-tabs .nav-link { color: white; border: none; background: transparent; font-size: 0.9rem; padding: 10px 20px; transition: 0.3s; }
+        .nav-tabs .nav-link.active { border-bottom: 3px solid var(--neon); color: var(--neon); }
+
+        .main-card { background: var(--card); border-radius: 15px; padding: 30px; border: 1px solid #252d47; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         .table { color: white; vertical-align: middle; }
-        .table-hover tbody tr:hover { background: rgba(0, 255, 204, 0.05); }
-        .clickable-team { color: var(--neon); cursor: pointer; font-weight: bold; transition: 0.2s; }
-        .clickable-team:hover { color: white; text-shadow: 0 0 10px var(--neon); }
-        .pts-col { color: var(--neon); font-weight: bold; font-size: 1.2em; }
+        .table thead th { border: none; color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; }
+        .table tbody tr { border-bottom: 1px solid #252d47; transition: 0.2s; cursor: pointer; }
+        .table tbody tr:hover { background: rgba(0, 255, 204, 0.05); }
         
-        /* Badges */
-        .badge-goal { background: var(--neon); color: black; padding: 5px 12px; border-radius: 6px; font-weight: bold; font-size: 0.9em; }
-        .badge-yellow { background: var(--yellow); color: black; padding: 2px 8px; border-radius: 4px; font-weight: bold; }
-        .badge-red { background: var(--red); color: white; padding: 2px 8px; border-radius: 4px; font-weight: bold; }
+        .rank-num { font-weight: bold; width: 40px; }
+        .team-name { font-weight: 600; color: #fff; }
+        .pts-bold { font-weight: 800; color: #fff; font-size: 1.1rem; }
         
-        /* Modals */
-        .modal-content { background: var(--card); color: white; border: 2px solid var(--neon); border-radius: 20px; }
-        .match-item { background: rgba(0,0,0,0.4); border-radius: 12px; padding: 15px; margin-bottom: 10px; border-left: 5px solid var(--neon); }
+        /* Modal Styles */
+        .modal-content { background: var(--card); border: 1px solid var(--neon); border-radius: 20px; color: white; }
+        .player-badge { background: rgba(0, 255, 204, 0.1); border: 1px solid var(--neon); padding: 5px 12px; border-radius: 20px; margin: 5px; display: inline-block; font-size: 0.85rem; }
+        .match-box { background: rgba(0,0,0,0.2); border-radius: 10px; padding: 12px; margin-bottom: 10px; border-left: 4px solid var(--neon); }
+        .owner-info { color: var(--neon); font-size: 0.9rem; margin-bottom: 15px; display: block; }
     </style>
 </head>
 <body>
 
-<nav class="navbar navbar-dark sticky-top p-3 mb-4">
+<nav class="navbar navbar-dark sticky-top">
     <div class="container d-flex justify-content-between align-items-center">
-        <h2 class="m-0 text-neon" style="font-size: 1.5rem;">DRAFTBANK</h2>
-        <span class="badge outline-neon">2024 / 2025</span>
+        <h2 class="m-0 text-neon" style="font-size: 1.2rem; letter-spacing: 2px;">DB</h2>
+        <ul class="nav nav-tabs m-0" id="leagueTabs" role="tablist">
+            <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-1a">1ª DIV</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-f2">F2</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-rankings">RANKINGS</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-cal">CALENDARIO</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-normas">NORMAS</button></li>
+        </ul>
     </div>
 </nav>
 
-<div class="container">
-    <ul class="nav nav-tabs mb-4" id="leagueTabs" role="tablist">
-        <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-1a">1ª DIVISIÓN</button></li>
-        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-f2">F2 (MINI)</button></li>
-        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-pichichi">PICHICHI</button></li>
-        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-sanciones">SANCIONES</button></li>
-        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-calendario">CALENDARIO</button></li>
-        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-normas">NORMAS</button></li>
-    </ul>
-
+<div class="container mt-5">
     <div class="tab-content">
         <div class="tab-pane fade show active" id="tab-1a">
-            <div class="card-stats">
-                <h3 class="mb-4">Clasificación 1ª</h3>
+            <div class="main-card">
+                <h3 class="mb-4 text-neon" style="font-size: 1.4rem;">CLASIFICACIÓN 1ª DIVISIÓN</h3>
                 <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead><tr><th>#</th><th>Equipo</th><th>PJ</th><th>G</th><th>E</th><th>P</th><th>Dif</th><th>Pts</th></tr></thead>
+                    <table class="table">
+                        <thead>
+                            <tr><th>#</th><th>Equipo</th><th>J</th><th>G</th><th>E</th><th>P</th><th>Dif</th><th>Pts</th></tr>
+                        </thead>
                         <tbody id="render-1a"></tbody>
                     </table>
                 </div>
@@ -69,150 +65,111 @@
         </div>
 
         <div class="tab-pane fade" id="tab-f2">
-            <div class="card-stats">
-                <h3 class="mb-4">Clasificación F2</h3>
+            <div class="main-card">
+                <h3 class="mb-4 text-neon" style="font-size: 1.4rem;">CLASIFICACIÓN F2</h3>
                 <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead><tr><th>#</th><th>Equipo</th><th>PJ</th><th>G</th><th>E</th><th>P</th><th>Dif</th><th>Pts</th></tr></thead>
+                    <table class="table">
+                        <thead>
+                            <tr><th>#</th><th>Equipo</th><th>J</th><th>G</th><th>E</th><th>P</th><th>Dif</th><th>Pts</th></tr>
+                        </thead>
                         <tbody id="render-f2"></tbody>
                     </table>
                 </div>
             </div>
         </div>
-
-        <div class="tab-pane fade" id="tab-pichichi">
-            <div class="card-stats">
-                <h3 class="mb-4 text-neon">Máximos Goleadores</h3>
-                <div id="render-pichichi"></div>
-            </div>
-        </div>
-
-        <div class="tab-pane fade" id="tab-sanciones">
-            <div class="card-stats">
-                <h3 class="mb-4 text-danger">Comité de Disciplina</h3>
-                <div id="render-sanciones"></div>
-            </div>
-        </div>
-
-        <div class="tab-pane fade" id="tab-calendario">
-            <div class="card-stats">
-                <h3 class="mb-4">Últimos Resultados</h3>
-                <div id="render-calendario"></div>
-            </div>
-        </div>
-
-        <div class="tab-pane fade" id="tab-normas">
-            <div class="card-stats">
-                <h3 class="text-neon">Reglamento Oficial</h3>
-                <hr>
-                <h5>1. Fair Play</h5>
-                <p class="text-secondary">Prohibido insultar o toxicidad en el grupo.</p>
-                <h5>2. Conexión</h5>
-                <p class="text-secondary">Si hay lag, se debe avisar en los primeros 10 min de partido.</p>
-                <h5>3. Tarjetas</h5>
-                <p class="text-secondary">3 Amarillas acumuladas = 1 Partido de sanción.</p>
-            </div>
-        </div>
     </div>
 </div>
 
-<div class="modal fade" id="teamModal" tabindex="-1">
+<div class="modal fade" id="detailModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header border-0"><h4 class="modal-title" id="m-title"></h4><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
-            <div class="modal-body" id="m-body"></div>
+            <div class="modal-header border-0 pb-0">
+                <h4 class="modal-title text-neon" id="m-team-name"></h4>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <span id="m-owner" class="owner-info"></span>
+                <h6 class="text-muted small text-uppercase mb-3">Plantilla de Jugadores</h6>
+                <div id="m-players" class="mb-4"></div>
+                <hr style="border-color: #252d47;">
+                <h6 class="text-muted small text-uppercase mb-3">Últimos Partidos</h6>
+                <div id="m-matches"></div>
+            </div>
         </div>
     </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    // --- DATOS LIGA 1 ---
-    const dataL1 = [
-        { n: "Obolskin...", j: 20, g: 14, e: 2, p: 4, d: 51, pts: 44 },
-        { n: "Er Mála...", j: 19, g: 14, e: 0, p: 5, d: 39, pts: 42 },
-        { n: "Cara al...", j: 19, g: 13, e: 2, p: 4, d: 35, pts: 38 },
-        { n: "Pedri En...", j: 19, g: 10, e: 3, p: 6, d: 22, pts: 33 },
-        { n: "Real de...", j: 19, g: 9, e: 4, p: 6, d: -8, pts: 31 },
-        { n: "Aston Bi...", j: 17, g: 8, e: 3, p: 6, d: 11, pts: 27 },
-        { n: "ViaRect...", j: 19, g: 7, e: 4, p: 8, d: 18, pts: 25 },
-        { n: "Teticos ...", j: 19, g: 6, e: 3, p: 10, d: -22, pts: 21 },
-        { n: "Unión Es...", j: 20, g: 5, e: 3, p: 12, d: -26, pts: 18 },
-        { n: "Casinos ...", j: 20, g: 4, e: 3, p: 13, d: -43, pts: 15 },
-        { n: "Salaman...", j: 17, g: 0, e: 1, p: 16, d: -77, pts: 1 }
+    // DATOS DE LA 1ª DIVISIÓN
+    const liga1 = [
+        { n: "Obolskin Club", o: "Sergio", j: 20, g: 14, e: 2, p: 4, d: 51, pts: 44, plys: ["Mbappé", "Courtois", "Rodri"] },
+        { n: "Er Málaga CF", o: "Juan", j: 19, g: 14, e: 0, p: 5, d: 39, pts: 42, plys: ["Haaland", "Vini Jr", "Kimmich"] },
+        { n: "Cara al Sol", o: "Dani", j: 19, g: 13, e: 2, p: 4, d: 35, pts: 38, plys: ["Kane", "Salah", "Ederson"] },
+        { n: "Pedri Entrenador", o: "Adri", j: 19, g: 10, e: 3, p: 6, d: 22, pts: 33, plys: ["Pedri", "Lewandowski"] },
+        { n: "Real de Madrid", o: "Carlos", j: 19, g: 9, e: 4, p: 6, d: -8, pts: 31, plys: ["Bellingham", "Gavi"] },
+        { n: "Aston Birra", o: "Mikel", j: 17, g: 8, e: 3, p: 6, d: 11, pts: 27, plys: ["Watkins", "Dibu"] },
+        { n: "ViaRecta FC", o: "Fran", j: 19, g: 7, e: 4, p: 8, d: 18, pts: 25, plys: ["Gerard Moreno"] },
+        { n: "Teticos Madrid", o: "Luis", j: 19, g: 6, e: 3, p: 10, d: -22, pts: 21, plys: ["Griezmann"] },
+        { n: "Unión Española", o: "Pablo", j: 20, g: 5, e: 3, p: 12, d: -26, pts: 18, plys: ["Aspas"] },
+        { n: "Casinos FC", o: "Manu", j: 20, g: 4, e: 3, p: 13, d: -43, pts: 15, plys: ["Joselu"] },
+        { n: "Salamanca", o: "Pepe", j: 17, g: 0, e: 1, p: 16, d: -77, pts: 1, plys: ["Canales"] }
     ];
 
-    // --- DATOS F2 ---
-    const dataF2 = [
-        { n: "AB Tara...", j: 19, g: 16, e: 1, p: 2, d: 47, pts: 49 },
-        { n: "Peeina ...", j: 18, g: 13, e: 2, p: 3, d: 19, pts: 40 },
-        { n: "Loluba", j: 18, g: 11, e: 1, p: 6, d: -2, pts: 34 },
-        { n: "Bordalet...", j: 20, g: 11, e: 0, p: 9, d: 18, pts: 33 },
-        { n: "Nazis FC", j: 19, g: 9, e: 1, p: 9, d: -1, pts: 28 },
-        { n: "West So...", j: 18, g: 8, e: 3, p: 7, d: -9, pts: 27 },
-        { n: "Benjami...", j: 16, g: 8, e: 2, p: 6, d: -3, pts: 25 },
-        { n: "Sepias FC", j: 18, g: 7, e: 0, p: 11, d: 10, pts: 21 },
-        { n: "Valencia...", j: 20, g: 5, e: 1, p: 14, d: -58, pts: 16 },
-        { n: "Romare...", j: 20, g: 4, e: 0, p: 16, d: -10, pts: 12 },
-        { n: "Petarder...", j: 16, g: 3, e: 1, p: 12, d: -11, pts: 10 }
+    // DATOS DE LA F2
+    const liga2 = [
+        { n: "AB Tara", o: "Santi", j: 19, g: 16, e: 1, p: 2, d: 47, pts: 49, plys: ["Benzema"] },
+        { n: "Peeina FC", o: "Hugo", j: 18, g: 13, e: 2, p: 3, d: 19, pts: 40, plys: ["Lautaro"] },
+        { n: "Loluba", o: "Ruben", j: 18, g: 11, e: 1, p: 6, d: -2, pts: 34, plys: ["Foden"] },
+        { n: "Bordaletas", o: "Jose", j: 20, g: 11, e: 0, p: 9, d: 18, pts: 33, plys: ["Getafe Man"] },
+        { n: "Nazis FC", o: "Unknown", j: 19, g: 9, e: 1, p: 9, d: -1, pts: 28, plys: ["Hummels"] }
+        // ... añadir resto según imagen 2
     ];
 
-    // --- DATOS JUGADORES (PICHICHI Y TARJETAS) ---
-    const dataJug = [
-        { n: "Nombre Jugador", e: "Equipo", g: 15, y: 3, r: 1 },
-        { n: "Otro Crack", e: "Equipo", g: 12, y: 1, r: 0 }
+    const matches = [
+        { l: "Obolskin Club", v: "Er Málaga CF", r: "3 - 1", j: "Jor 18" },
+        { l: "Cara al Sol", v: "Pedri Entrenador", r: "2 - 2", j: "Jor 19" }
     ];
 
-    // --- HISTORIAL DE PARTIDOS (CALENDARIO) ---
-    const dataMatches = [
-        { l: "Obolskin...", v: "Er Mála...", res: "3 - 2", j: "Jor 20" },
-        { l: "AB Tara...", v: "Peeina ...", res: "0 - 0", j: "F2 J19" }
-    ];
-
-    function start() {
-        // Render Tables
-        const r1 = document.getElementById('render-1a');
-        dataL1.sort((a,b)=>b.pts-a.pts).forEach((e,i) => {
-            r1.innerHTML += `<tr><td>${i+1}</td><td><span class="clickable-team" onclick="showTeam('${e.n}')">${e.n}</span></td><td>${e.j}</td><td>${e.g}</td><td>${e.e}</td><td>${e.p}</td><td>${e.d}</td><td class="pts-col">${e.pts}</td></tr>`;
-        });
-
-        const r2 = document.getElementById('render-f2');
-        dataF2.sort((a,b)=>b.pts-a.pts).forEach((e,i) => {
-            r2.innerHTML += `<tr><td>${i+1}</td><td><span class="clickable-team" onclick="showTeam('${e.n}')">${e.n}</span></td><td>${e.j}</td><td>${e.g}</td><td>${e.e}</td><td>${e.p}</td><td>${e.d}</td><td class="pts-col">${e.pts}</td></tr>`;
-        });
-
-        // Render Pichichi
-        const rP = document.getElementById('render-pichichi');
-        dataJug.sort((a,b)=>b.g-a.g).forEach(j => {
-            rP.innerHTML += `<div class="d-flex justify-content-between align-items-center mb-3 border-bottom border-secondary pb-2"><span><strong>${j.n}</strong> <small class="text-secondary">(${j.e})</small></span><span class="badge-goal">${j.g} GOLES</span></div>`;
-        });
-
-        // Render Sanciones
-        const rS = document.getElementById('render-sanciones');
-        dataJug.filter(j => j.y > 0 || j.r > 0).forEach(j => {
-            rS.innerHTML += `<div class="d-flex justify-content-between align-items-center mb-2"><span>${j.n}</span><span>${j.y > 0 ? `<span class="badge-yellow">${j.y} 🟨</span>` : ''} ${j.r > 0 ? `<span class="badge-red">${j.r} 🟥</span>` : ''}</span></div>`;
-        });
-
-        // Render Calendario
-        const rC = document.getElementById('render-calendario');
-        dataMatches.forEach(m => {
-            rC.innerHTML += `<div class="match-item text-center"><strong>${m.j}</strong><br>${m.l} <span class="text-neon mx-2">${m.res}</span> ${m.v}</div>`;
+    function renderTable(data, elementId) {
+        const tbody = document.getElementById(elementId);
+        data.forEach((eq, i) => {
+            const tr = document.createElement('tr');
+            tr.onclick = () => showDetails(eq);
+            tr.innerHTML = `
+                <td class="rank-num text-muted">${i+1}</td>
+                <td class="team-name">${eq.n}</td>
+                <td>${eq.j}</td><td>${eq.g}</td><td>${eq.e}</td><td>${eq.p}</td>
+                <td class="${eq.d > 0 ? 'text-success' : 'text-danger'}">${eq.d > 0 ? '+' : ''}${eq.d}</td>
+                <td class="pts-bold">${eq.pts}</td>
+            `;
+            tbody.appendChild(tr);
         });
     }
 
-    function showTeam(name) {
-        document.getElementById('m-title').innerText = name;
-        const body = document.getElementById('m-body');
-        body.innerHTML = '';
-        const history = dataMatches.filter(m => m.l === name || m.v === name);
-        if(history.length === 0) body.innerHTML = '<p class="text-center text-secondary">No hay partidos registrados aún.</p>';
-        else history.forEach(m => {
-            body.innerHTML += `<div class="match-item text-center"><strong>${m.j}</strong><br>${m.l} ${m.res} ${m.v}</div>`;
-        });
-        new bootstrap.Modal(document.getElementById('teamModal')).show();
+    function showDetails(team) {
+        document.getElementById('m-team-name').innerText = team.n;
+        document.getElementById('m-owner').innerText = "Manager: " + team.o;
+        
+        const pDiv = document.getElementById('m-players');
+        pDiv.innerHTML = team.plys.map(p => `<span class="player-badge">${p}</span>`).join('');
+        
+        const mDiv = document.getElementById('m-matches');
+        const teamMatches = matches.filter(m => m.l === team.n || m.v === team.n);
+        mDiv.innerHTML = teamMatches.length ? teamMatches.map(m => `
+            <div class="match-box d-flex justify-content-between align-items-center">
+                <small class="text-muted">${m.j}</small>
+                <span>${m.l} <b>${m.r}</b> ${m.v}</span>
+            </div>
+        `).join('') : '<p class="small text-muted">No hay partidos registrados aún.</p>';
+
+        new bootstrap.Modal(document.getElementById('detailModal')).show();
     }
 
-    window.onload = start;
+    document.addEventListener('DOMContentLoaded', () => {
+        renderTable(liga1, 'render-1a');
+        renderTable(liga2, 'render-f2');
+    });
 </script>
 </body>
 </html>
