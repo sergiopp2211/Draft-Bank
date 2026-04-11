@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liga DraftBank | Web Oficial</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --fifa-blue: #00051a;
+            --fifa-neon: #00ffcc;
+            --fifa-card: #1a1f3c;
+        }
+        body {
+            background-color: var(--fifa-blue);
+            color: white;
+            font-family: 'Roboto', sans-serif;
+        }
+        h1, h2, h3, .nav-link {
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
+        }
+        .navbar { background: rgba(0, 0, 0, 0.9); border-bottom: 2px solid var(--fifa-neon); }
+        .card-stats {
+            background: var(--fifa-card);
+            border: 1px solid #333;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .table { color: white; border-color: #444; vertical-align: middle; }
+        .table-hover tbody tr:hover { background-color: rgba(0, 255, 204, 0.1); }
+        .pichichi-rank { color: var(--fifa-neon); font-weight: bold; }
+        .ads-banner {
+            background: linear-gradient(45deg, #00ffcc, #0088ff);
+            height: 90px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #00051a;
+            font-weight: 900;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+    <div class="container">
+        <a class="navbar-brand text-neon" href="#">DRAFTBANK LEAGUE</a>
+        <div class="navbar-nav ms-auto">
+            <a class="nav-link" href="#clasificacion">1ª División</a>
+            <a class="nav-link" href="#rankings">Rankings</a>
+            <a class="nav-link" href="#normas">Normas</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    <div class="ads-banner"> Espacio para Publicidad / Próximo Torneo </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <section id="clasificacion" class="card-stats">
+                <h2>1ª DIVISIÓN</h2>
+                <div class="table-responsive">
+                    <table class="table table-hover mt-3">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Equipo</th>
+                                <th>J</th>
+                                <th>G</th>
+                                <th>E</th>
+                                <th>P</th>
+                                <th>Dif</th>
+                                <th>Pts</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-1a">
+                            </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+
+        <div class="col-lg-4">
+            <section id="rankings" class="card-stats">
+                <h3>Máximos Goleadores 🔥</h3>
+                <div id="pichichi-list">
+                    </div>
+            </section>
+
+            <section class="card-stats">
+                <h3>Tarjetas 🟨🟥</h3>
+                <div id="cards-list">
+                    <div class="d-flex justify-content-between border-bottom py-2">
+                        <span>Jugador Ejemplo</span>
+                        <span class="text-warning">2 🟨 1 🟥</span>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <section id="normas" class="card-stats mt-4">
+        <h2>Nuevas Normas y Notas</h2>
+        <ul id="normas-list">
+            <li><strong>Fair Play:</strong> Prohibido tirar del cable. Sanción de -3 puntos.</li>
+            <li><strong>Fichajes:</strong> El mercado abre el lunes a las 00:00.</li>
+            <li><strong>Resultados:</strong> Obligatorio subir captura al grupo tras el partido.</li>
+        </ul>
+    </section>
+</div>
+
+<script>
+    // --- DATOS REALES DE TU LIGA ---
+    const equipos = [
+        { n: "Obolskinhos", j: 20, g: 14, e: 2, p: 4, df: 51, pts: 44 },
+        { n: "Er Málaga", j: 19, g: 14, e: 0, p: 5, df: 39, pts: 42 },
+        { n: "Cara al Gol", j: 19, g: 13, e: 2, p: 4, df: 35, pts: 38 },
+        { n: "Pedri Enjoyer", j: 19, g: 10, e: 3, p: 6, df: 22, pts: 33 },
+        { n: "Real de Madrid", j: 19, g: 9, e: 4, p: 6, df: -8, pts: 31 },
+        { n: "Aston Birra", j: 17, g: 8, e: 3, p: 6, df: 11, pts: 27 },
+        { n: "ViaRectal", j: 19, g: 7, e: 4, p: 8, df: 18, pts: 25 },
+        { n: "Teticos de Vallekas", j: 19, g: 6, e: 3, p: 10, df: -22, pts: 21 },
+        { n: "Unión Española", j: 20, g: 5, e: 3, p: 12, df: -26, pts: 18 },
+        { n: "Casinos", j: 20, g: 4, e: 3, p: 13, df: -43, pts: 15 },
+        { n: "Salamanca", j: 17, g: 0, e: 1, p: 16, df: -77, pts: 1 }
+    ];
+
+    const goleadores = [
+        { nombre: "Mbappé", goles: 24, equipo: "Obolskin" },
+        { nombre: "Haaland", goles: 19, equipo: "Er Mála" },
+        { nombre: "Vinicius", goles: 15, equipo: "Cara al" }
+    ];
+
+    function cargarWeb() {
+        // Cargar Tabla
+        const tabla = document.getElementById('tabla-1a');
+        equipos.sort((a,b) => b.pts - a.pts).forEach((eq, index) => {
+            tabla.innerHTML += `<tr>
+                <td>${index + 1}</td>
+                <td style="font-weight:bold">${eq.n}</td>
+                <td>${eq.j}</td>
+                <td>${eq.g}</td>
+                <td>${eq.e}</td>
+                <td>${eq.p}</td>
+                <td>${eq.df > 0 ? '+' + eq.df : eq.df}</td>
+                <td class="pichichi-rank">${eq.pts}</td>
+            </tr>`;
+        });
+
+        // Cargar Goleadores
+        const pichichis = document.getElementById('pichichi-list');
+        goleadores.forEach(jug => {
+            pichichis.innerHTML += `<div class="d-flex justify-content-between border-bottom py-2">
+                <span>${jug.nombre} <small>(${jug.equipo})</small></span>
+                <span class="pichichi-rank">${jug.goles} Goles</span>
+            </div>`;
+        });
+    }
+
+    window.onload = cargarWeb;
+</script>
+
+</body>
+</html>
