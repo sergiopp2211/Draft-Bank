@@ -11,18 +11,25 @@
         body { background-color: var(--bg); color: var(--white); font-family: 'Roboto', sans-serif; }
         h1, h2, h3, h4, .nav-link { font-family: 'Orbitron', sans-serif; letter-spacing: 1px; }
         
-        /* Contraste y Navbar */
+        /* Navbar y Logo */
         .navbar { background: #000; border-bottom: 2px solid var(--neon); }
+        .league-logo { height: 50px; width: auto; filter: drop-shadow(0 0 5px var(--neon)); }
+
         .nav-tabs { border: none; flex-wrap: nowrap; overflow-x: auto; margin-bottom: 20px; }
         .nav-tabs .nav-link { color: #aaa; background: #1a2035; margin-right: 5px; border-radius: 8px; border: none; white-space: nowrap; }
         .nav-tabs .nav-link.active { background: var(--neon); color: #000; font-weight: bold; }
 
-        /* Clasificación */
+        /* Clasificación y Tarjetas */
         .main-card { background: var(--card); border-radius: 15px; padding: 20px; border: 1px solid #252d47; margin-bottom: 25px; }
-        .table { color: var(--white) !important; font-size: 0.9rem; }
+        .match-card { background: rgba(255,255,255,0.05); border-radius: 10px; padding: 15px; margin-bottom: 10px; border-left: 4px solid var(--neon); }
+        .table { color: var(--white) !important; font-size: 0.9rem; vertical-align: middle; }
         .table thead th { color: var(--neon); border-bottom: 1px solid #252d47; }
         .clickable-team:hover { background: rgba(0, 255, 204, 0.1); cursor: pointer; transition: 0.3s; }
         .pts-bold { color: var(--neon); font-weight: bold; font-size: 1.1rem; }
+        
+        /* Escudos */
+        .shield-mini { width: 30px; height: 30px; margin-right: 10px; object-fit: contain; }
+        .shield-modal { width: 100px; height: 100px; object-fit: contain; margin-bottom: 15px; filter: drop-shadow(0 0 10px rgba(0,255,204,0.3)); }
 
         /* Estadísticas */
         .stat-card { background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; margin-bottom: 8px; border-left: 3px solid var(--neon); display: flex; justify-content: space-between; align-items: center;}
@@ -32,17 +39,18 @@
         /* Modal */
         .modal-content { background: #1a2035; border: 2px solid var(--neon); color: var(--white); border-radius: 20px; }
         .player-tag { background: rgba(0, 255, 204, 0.2); border: 1px solid var(--neon); color: var(--white); padding: 4px 10px; border-radius: 6px; margin: 4px; display: inline-block; }
-        
-        /* Llaves de Copa */
         .bracket-match { border: 1px solid var(--neon); padding: 10px; margin: 10px 0; border-radius: 8px; text-align: center; }
     </style>
 </head>
 <body>
 
 <nav class="navbar navbar-dark p-3 sticky-top">
-    <div class="container d-flex justify-content-between">
-        <h2 class="m-0 text-neon">DRAFTBANK</h2>
-        <small class="text-secondary d-none d-md-block">PANEL DE CONTROL LIGA</small>
+    <div class="container d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center">
+            <img src="https://cdn-icons-png.flaticon.com/512/5323/5323451.png" alt="Logo Liga" class="league-logo me-3">
+            <h2 class="m-0 text-neon">DRAFTBANK</h2>
+        </div>
+        <small class="text-secondary d-none d-md-block text-uppercase">Panel de Control Oficial</small>
     </div>
 </nav>
 
@@ -51,7 +59,7 @@
         <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-l1">1ª DIVISIÓN</button></li>
         <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-l2">F2 (MINI)</button></li>
         <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-copa">COPA</button></li>
-        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-stats">ESTADÍSTICAS JUGADORES</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-stats">ESTADÍSTICAS</button></li>
         <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-cal">CALENDARIO & NOTICIAS</button></li>
     </ul>
 
@@ -84,16 +92,10 @@
             <div class="main-card">
                 <h4 class="text-center text-neon mb-4">FASE DE GRUPOS - COPA</h4>
                 <div class="row">
-                    <div class="col-md-3"><h6>GRUPO A (6)</h6><div id="grupo-a"></div></div>
-                    <div class="col-md-3"><h6>GRUPO B (5)</h6><div id="grupo-b"></div></div>
-                    <div class="col-md-3"><h6>GRUPO C (6)</h6><div id="grupo-c"></div></div>
-                    <div class="col-md-3"><h6>GRUPO D (5)</h6><div id="grupo-d"></div></div>
-                </div>
-                <h4 class="text-center text-neon mt-5 mb-4">FASE FINAL</h4>
-                <div class="row">
-                    <div class="col-md-4"><h6>CUARTOS</h6><div class="bracket-match">1ºA vs 2ºB</div><div class="bracket-match">1ºC vs 2ºD</div></div>
-                    <div class="col-md-4"><h6>SEMIS</h6><div class="bracket-match">Ganador 1 vs Ganador 2</div></div>
-                    <div class="col-md-4"><h6>FINAL</h6><div class="bracket-match" style="background: var(--neon); color: #000;">GRAN FINAL</div></div>
+                    <div class="col-md-3"><h6>GRUPO A</h6><div id="grupo-a"></div></div>
+                    <div class="col-md-3"><h6>GRUPO B</h6><div id="grupo-b"></div></div>
+                    <div class="col-md-3"><h6>GRUPO C</h6><div id="grupo-c"></div></div>
+                    <div class="col-md-3"><h6>GRUPO D</h6><div id="grupo-d"></div></div>
                 </div>
             </div>
         </div>
@@ -109,12 +111,8 @@
 
         <div class="tab-pane fade" id="tab-cal">
             <div class="row">
-                <div class="col-md-6">
-                    <div class="main-card"><h4>NOTICIAS</h4><div id="lista-noticias"></div></div>
-                </div>
-                <div class="col-md-6">
-                    <div class="main-card"><h4>CALENDARIO PRÓXIMO</h4><div id="lista-calendario"></div></div>
-                </div>
+                <div class="col-md-6"><div class="main-card"><h4>NOTICIAS</h4><div id="lista-noticias"></div></div></div>
+                <div class="col-md-6"><div class="main-card"><h4>CALENDARIO</h4><div id="lista-calendario"></div></div></div>
             </div>
         </div>
     </div>
@@ -123,13 +121,18 @@
 <div class="modal fade" id="equipoModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header border-0"><h4 id="modal-equipo-nombre" class="text-neon"></h4><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
-            <div class="modal-body">
-                <p><strong>Owner:</strong> <span id="modal-owner" class="text-white"></span></p>
-                <h6 class="text-neon">PLANTILLA:</h6>
-                <div id="modal-plantilla" class="mb-4"></div>
-                <h6 class="text-neon">HISTORIAL PARTIDOS:</h6>
-                <div id="modal-partidos"></div>
+            <div class="modal-header border-0"><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body text-center">
+                <img id="modal-shield" src="" class="shield-modal">
+                <h3 id="modal-equipo-nombre" class="text-neon mb-1"></h3>
+                <p class="mb-4 text-secondary text-uppercase" style="font-size: 0.8rem;">Manager: <span id="modal-owner" class="text-white"></span></p>
+                
+                <div class="text-start">
+                    <h6 class="text-neon small">PLANTILLA ACTUAL:</h6>
+                    <div id="modal-plantilla" class="mb-4"></div>
+                    <h6 class="text-neon small">ÚLTIMOS RESULTADOS:</h6>
+                    <div id="modal-partidos"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -137,36 +140,34 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    /* =========================================
-       BASE DE DATOS (RELLENA AQUÍ TUS DATOS)
-       ========================================= */
+    const defShield = "https://cdn-icons-png.flaticon.com/512/5323/5323451.png";
 
     const liga1 = [
-        { n: "Obolskin Club", o: "Sergio", pj: 20, g: 14, e: 2, p: 4, dif: 51, pts: 44 },
-        { n: "Er Málaga CF", o: "Juan", pj: 19, g: 14, e: 0, p: 5, dif: 39, pts: 42 },
-        { n: "Cara al Sol", o: "Dani", pj: 19, g: 13, e: 2, p: 4, dif: 35, pts: 38 },
-        { n: "Pedri Entrenador", o: "Adri", pj: 19, g: 10, e: 3, p: 6, dif: 22, pts: 33 },
-        { n: "Real de Madrid", o: "Carlos", pj: 19, g: 9, e: 4, p: 6, dif: -8, pts: 31 },
-        { n: "Aston Birra", o: "Mikel", pj: 17, g: 8, e: 3, p: 6, dif: 11, pts: 27 },
-        { n: "ViaRecta FC", o: "Fran", pj: 19, g: 7, e: 4, p: 8, dif: 18, pts: 25 },
-        { n: "Teticos Madrid", o: "Luis", pj: 19, g: 6, e: 3, p: 10, dif: -22, pts: 21 },
-        { n: "Unión Española", o: "Pablo", pj: 20, g: 5, e: 3, p: 12, dif: -26, pts: 18 },
-        { n: "Casinos FC", o: "Manu", pj: 20, g: 4, e: 3, p: 13, dif: -43, pts: 15 },
-        { n: "Salamanca", o: "Pepe", pj: 17, g: 0, e: 1, p: 16, dif: -77, pts: 1 }
+        { n: "Obolskin Club", o: "Sergio", pj: 20, g: 14, e: 2, p: 4, dif: 51, pts: 44, img: defShield },
+        { n: "Er Málaga CF", o: "Juan", pj: 19, g: 14, e: 0, p: 5, dif: 39, pts: 42, img: defShield },
+        { n: "Cara al Sol", o: "Dani", pj: 19, g: 13, e: 2, p: 4, dif: 35, pts: 38, img: defShield },
+        { n: "Pedri Entrenador", o: "Adri", pj: 19, g: 10, e: 3, p: 6, dif: 22, pts: 33, img: defShield },
+        { n: "Real de Madrid", o: "Carlos", pj: 19, g: 9, e: 4, p: 6, dif: -8, pts: 31, img: defShield },
+        { n: "Aston Birra", o: "Mikel", pj: 17, g: 8, e: 3, p: 6, dif: 11, pts: 27, img: defShield },
+        { n: "ViaRecta FC", o: "Fran", pj: 19, g: 7, e: 4, p: 8, dif: 18, pts: 25, img: defShield },
+        { n: "Teticos Madrid", o: "Luis", pj: 19, g: 6, e: 3, p: 10, dif: -22, pts: 21, img: defShield },
+        { n: "Unión Española", o: "Pablo", pj: 20, g: 5, e: 3, p: 12, dif: -26, pts: 18, img: defShield },
+        { n: "Casinos FC", o: "Manu", pj: 20, g: 4, e: 3, p: 13, dif: -43, pts: 15, img: defShield },
+        { n: "Salamanca", o: "Pepe", pj: 17, g: 0, e: 1, p: 16, dif: -77, pts: 1, img: defShield }
     ];
 
     const liga2 = [
-        { n: "AB Tara", o: "Santi", pj: 19, g: 16, e: 1, p: 2, dif: 47, pts: 49 },
-        { n: "Peeina FC", o: "Hugo", pj: 18, g: 13, e: 2, p: 3, dif: 19, pts: 40 },
-        { n: "Loluba", o: "Ruben", pj: 18, g: 11, e: 1, p: 6, dif: -2, pts: 34 },
-        { n: "Bordaletas", o: "Jose", pj: 20, g: 11, e: 0, p: 9, dif: 18, pts: 33 },
-        { n: "Nazis FC", o: "David", pj: 19, g: 9, e: 1, p: 9, dif: -1, pts: 28 },
-        { n: "West Soyen", o: "Manager6", pj: 18, g: 8, e: 3, p: 7, dif: -9, pts: 27 },
-        { n: "Benjamines", o: "Manager7", pj: 16, g: 8, e: 2, p: 6, dif: -3, pts: 25 },
-        { n: "Sepias FC", o: "Manager8", pj: 18, g: 7, e: 0, p: 11, dif: 10, pts: 21 },
-        { n: "Valencia CF", o: "Manager9", pj: 20, g: 5, e: 1, p: 14, dif: -58, pts: 16 },
-        { n: "Romareda", o: "Manager10", pj: 20, g: 4, e: 0, p: 16, dif: -10, pts: 12 },
-        { n: "Petarderos", o: "Manager11", pj: 16, g: 3, e: 1, p: 12, dif: -11, pts: 10 }
+        { n: "AB Tara", o: "Santi", pj: 19, g: 16, e: 1, p: 2, dif: 47, pts: 49, img: defShield },
+        { n: "Peeina FC", o: "Hugo", pj: 18, g: 13, e: 2, p: 3, dif: 19, pts: 40, img: defShield },
+        { n: "Loluba", o: "Ruben", pj: 18, g: 11, e: 1, p: 6, dif: -2, pts: 34, img: defShield },
+        { n: "Bordaletas", o: "Jose", pj: 20, g: 11, e: 0, p: 9, dif: 18, pts: 33, img: defShield },
+        { n: "Nazis FC", o: "David", pj: 19, g: 9, e: 1, p: 9, dif: -1, pts: 28, img: defShield },
+        { n: "West Soyen", o: "Manager6", pj: 18, g: 8, e: 3, p: 7, dif: -9, pts: 27, img: defShield },
+        { n: "Benjamines", o: "Manager7", pj: 16, g: 8, e: 2, p: 6, dif: -3, pts: 25, img: defShield },
+        { n: "Sepias FC", o: "Manager8", pj: 18, g: 7, e: 0, p: 11, dif: 10, pts: 21, img: defShield },
+        { n: "Valencia CF", o: "Manager9", pj: 20, g: 5, e: 1, p: 14, dif: -58, pts: 16, img: defShield },
+        { n: "Romareda", o: "Manager10", pj: 20, g: 4, e: 0, p: 16, dif: -10, pts: 12, img: defShield },
+        { n: "Petarderos", o: "Manager11", pj: 16, g: 3, e: 1, p: 12, dif: -11, pts: 10, img: defShield }
     ];
 
     const jugadores = [
@@ -175,38 +176,24 @@
         { n: "Vini Jr", e: "Er Málaga CF", g: 15, a: 12, ama: 1, r: 0 }
     ];
 
-    const noticias = [
-        { t: "¡Cierre de mercado!", d: "El mercado finaliza este viernes." },
-        { t: "Copa DraftBank", d: "Sorteada la fase de grupos para la próxima semana." }
-    ];
-
-    const calendario = [
-        { p: "Obolskin Club vs Cara al Sol", f: "Mañana 22:00h" },
-        { p: "F2: AB Tara vs Loluba", f: "Domingo 18:00h" }
-    ];
-
-    const matchesHist = [
-        { l: "Obolskin Club", v: "Er Málaga CF", res: "3-1", j: "J18" }
-    ];
-
-    /* =========================================
-       FUNCIONES DE RENDERIZADO
-       ========================================= */
+    const noticias = [{ t: "¡Cierre de mercado!", d: "El mercado finaliza este viernes." }];
+    const calendario = [{ p: "Obolskin Club vs Cara al Sol", f: "Mañana 22:00h" }];
+    const matchesHist = [{ l: "Obolskin Club", v: "Er Málaga CF", res: "3-1", j: "J18" }];
 
     function cargarTodo() {
-        // Tablas Ligas
         const drawL = (list, id) => {
             const table = document.getElementById(id);
             list.forEach((eq, i) => {
                 table.innerHTML += `<tr class="clickable-team" onclick="verEquipo('${eq.n}')">
-                    <td>${i+1}</td><td>${eq.n}</td><td>${eq.pj}</td><td>${eq.g}</td><td>${eq.e}</td><td>${eq.p}</td><td>${eq.dif}</td><td class="pts-bold">${eq.pts}</td>
+                    <td>${i+1}</td>
+                    <td class="d-flex align-items-center"><img src="${eq.img}" class="shield-mini"> ${eq.n}</td>
+                    <td>${eq.pj}</td><td>${eq.g}</td><td>${eq.e}</td><td>${eq.p}</td><td>${eq.dif}</td>
+                    <td class="pts-bold">${eq.pts}</td>
                 </tr>`;
             });
         };
-        drawL(liga1, 'body-l1');
-        drawL(liga2, 'body-l2');
+        drawL(liga1, 'body-l1'); drawL(liga2, 'body-l2');
 
-        // Estadísticas Jugadores
         const gList = document.getElementById('stats-goles');
         const aList = document.getElementById('stats-asist');
         const amaList = document.getElementById('stats-ama');
@@ -217,7 +204,6 @@
         jugadores.filter(j=>j.ama>0).forEach(j => amaList.innerHTML += `<div class="stat-card"><span>${j.n}</span><span class="badge-yellow">${j.ama}</span></div>`);
         jugadores.filter(j=>j.r>0).forEach(j => rList.innerHTML += `<div class="stat-card"><span>${j.n}</span><span class="badge-red">${j.r}</span></div>`);
 
-        // Noticias y Calendario
         noticias.forEach(n => document.getElementById('lista-noticias').innerHTML += `<div class="match-card"><b>${n.t}</b><br><small>${n.d}</small></div>`);
         calendario.forEach(c => document.getElementById('lista-calendario').innerHTML += `<div class="match-card"><b>${c.p}</b><br><small>${c.f}</small></div>`);
     }
@@ -226,15 +212,20 @@
         const eq = [...liga1, ...liga2].find(e => e.n === name);
         document.getElementById('modal-equipo-nombre').innerText = eq.n;
         document.getElementById('modal-owner').innerText = eq.o;
+        document.getElementById('modal-shield').src = eq.img;
         
         const plant = jugadores.filter(j => j.e === name);
         document.getElementById('modal-plantilla').innerHTML = plant.length ? plant.map(j => `<span class="player-tag">${j.n}</span>`).join('') : "No hay datos.";
         
         const hist = matchesHist.filter(m => m.l === name || m.v === name);
-        document.getElementById('modal-partidos').innerHTML = hist.length ? hist.map(m => `<div class="match-card text-center">${m.l} ${m.res} ${m.v} (${m.j})</div>`).join('') : "No hay partidos jugados.";
+        document.getElementById('modal-partidos').innerHTML = hist.length ? hist.map(m => `<div class="stat-card small"><span>${m.l} ${m.res} ${m.v}</span><span class="text-secondary">${m.j}</span></div>`).join('') : "No hay partidos jugados.";
 
         new bootstrap.Modal(document.getElementById('equipoModal')).show();
     }
+    window.onload = cargarTodo;
+</script>
+</body>
+</html>
 
     window.onload = cargarTodo;
 </script>
