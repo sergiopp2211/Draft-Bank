@@ -48,7 +48,7 @@
     <div class="container d-flex justify-content-between align-items-center">
         <div class="d-flex align-items-center">
             <img src="https://cdn-icons-png.flaticon.com/512/5323/5323451.png" alt="Logo Liga" class="league-logo me-3">
-            <h2 class="m-0 text-neon">DRAFTBANK</h2>
+            <h2 class="m-0 text-neon" style="color: #00ffcc;">DRAFTBANK</h2>
         </div>
         <small class="text-secondary d-none d-md-block text-uppercase">Panel de Control Oficial</small>
     </div>
@@ -172,25 +172,25 @@
     ];
 
     const jugadores = [
-        { n: "Mbappé", e: "Obolskin Club", g: 25, a: 10, ama: 2, r: 0 },
-        { n: "Haaland", e: "Er Málaga CF", g: 22, a: 4, ama: 5, r: 1 },
-        { n: "Vini Jr", e: "Er Málaga CF", g: 15, a: 12, ama: 1, r: 0 }
+        { n: "Mbappé", e: "Obolskinhos", g: 25, a: 10, ama: 2, r: 0 },
+        { n: "Haaland", e: "Er Málaga", g: 22, a: 4, ama: 5, r: 1 },
+        { n: "Vini Jr", e: "Er Málaga", g: 15, a: 12, ama: 1, r: 0 }
     ];
 
     const noticias = [{ t: "¡Cierre de mercado!", d: "El mercado finaliza este viernes." }];
-    const calendario = [{ p: "Obolskin Club vs Cara al Sol", f: "Mañana 22:00h" }];
-    const matchesHist = [{ l: "Obolskin Club", v: "Er Málaga CF", res: "3-1", j: "J18" }];
+    const calendario = [{ p: "Obolskinhos vs Cara al Sol", f: "Mañana 22:00h" }];
+    const matchesHist = [{ l: "Obolskinhos", v: "Er Málaga", res: "3-1", j: "J18" }];
 
     function cargarTodo() {
         const drawL = (list, id) => {
             const table = document.getElementById(id);
-            if (!table) return; // Seguridad por si no encuentra la tabla
-            table.innerHTML = ""; // Para que no se dupliquen al recargar
+            if (!table) return;
+            table.innerHTML = ""; 
             list.forEach((eq, i) => {
                 table.innerHTML += `<tr class="clickable-team" onclick="verEquipo('${eq.n}')">
                     <td>${i+1}</td>
                     <td class="d-flex align-items-center">
-                        <img src="${eq.img}" class="shield-mini" style="width:25px; height:25px; margin-right:10px;"> 
+                        <img src="${eq.img}" class="shield-mini" style="width:25px; height:25px; margin-right:10px; object-fit:contain;"> 
                         ${eq.n}
                     </td>
                     <td>${eq.pj}</td><td>${eq.g}</td><td>${eq.e}</td><td>${eq.p}</td><td>${eq.dif}</td>
@@ -198,6 +198,8 @@
                 </tr>`;
             });
         };
+        
+        // CORRECCIÓN DE IDS AQUÍ
         drawL(liga1, 'body-l1'); 
         drawL(liga2, 'body-l2');
         
@@ -206,10 +208,10 @@
         const amaList = document.getElementById('stats-ama');
         const rList = document.getElementById('stats-roja');
 
-        jugadores.sort((a,b)=>b.g-a.g).forEach(j => gList.innerHTML += `<div class="stat-card"><span>${j.n}</span><span class="text-neon">${j.g}</span></div>`);
-        jugadores.sort((a,b)=>b.a-a.a).forEach(j => aList.innerHTML += `<div class="stat-card"><span>${j.n}</span><span class="text-neon">${j.a}</span></div>`);
-        jugadores.filter(j=>j.ama>0).forEach(j => amaList.innerHTML += `<div class="stat-card"><span>${j.n}</span><span class="badge-yellow">${j.ama}</span></div>`);
-        jugadores.filter(j=>j.r>0).forEach(j => rList.innerHTML += `<div class="stat-card"><span>${j.n}</span><span class="badge-red">${j.r}</span></div>`);
+        if(gList) jugadores.sort((a,b)=>b.g-a.g).forEach(j => gList.innerHTML += `<div class="stat-card"><span>${j.n}</span><span class="text-neon">${j.g}</span></div>`);
+        if(aList) jugadores.sort((a,b)=>b.a-a.a).forEach(j => aList.innerHTML += `<div class="stat-card"><span>${j.n}</span><span class="text-neon">${j.a}</span></div>`);
+        if(amaList) jugadores.filter(j=>j.ama>0).forEach(j => amaList.innerHTML += `<div class="stat-card"><span>${j.n}</span><span class="badge-yellow">${j.ama}</span></div>`);
+        if(rList) jugadores.filter(j=>j.r>0).forEach(j => rList.innerHTML += `<div class="stat-card"><span>${j.n}</span><span class="badge-red">${j.r}</span></div>`);
 
         noticias.forEach(n => document.getElementById('lista-noticias').innerHTML += `<div class="match-card"><b>${n.t}</b><br><small>${n.d}</small></div>`);
         calendario.forEach(c => document.getElementById('lista-calendario').innerHTML += `<div class="match-card"><b>${c.p}</b><br><small>${c.f}</small></div>`);
@@ -217,6 +219,7 @@
 
     function verEquipo(name) {
         const eq = [...liga1, ...liga2].find(e => e.n === name);
+        if(!eq) return;
         document.getElementById('modal-equipo-nombre').innerText = eq.n;
         document.getElementById('modal-owner').innerText = eq.o;
         document.getElementById('modal-shield').src = eq.img;
