@@ -89,3 +89,173 @@
                     <div class="col-md-3"><h6>GRUPO A</h6><div id="grupo-a"></div></div>
                     <div class="col-md-3"><h6>GRUPO B</h6><div id="grupo-b"></div></div>
                     <div class="col-md-3"><h6>GRUPO C</h6><div id="grupo-c"></div></div>
+                    <div class="col-md-3"><h6>GRUPO D</h6><div id="grupo-d"></div></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="tab-stats">
+            <div class="row">
+                <div class="col-md-3"><h5>GOLES</h5><div id="stats-goles"></div></div>
+                <div class="col-md-3"><h5>ASISTENCIAS</h5><div id="stats-asist"></div></div>
+                <div class="col-md-3"><h5>AMARILLAS</h5><div id="stats-ama"></div></div>
+                <div class="col-md-3"><h5>ROJAS</h5><div id="stats-roja"></div></div>
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="tab-cal">
+            <div class="row">
+                <div class="col-md-6"><div class="main-card"><h4>NOTICIAS</h4><div id="lista-noticias"></div></div></div>
+                <div class="col-md-6"><div class="main-card"><h4>CALENDARIO</h4><div id="lista-calendario"></div></div></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="equipoModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0"><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body text-center">
+                <img id="modal-shield" src="" class="shield-modal">
+                <h3 id="modal-equipo-nombre" class="text-neon mb-1"></h3>
+                <p class="mb-4 text-secondary text-uppercase" style="font-size: 0.8rem;">Manager: <span id="modal-owner" class="text-white"></span></p>
+                <div class="text-start">
+                    <h6 class="text-neon small">PLANTILLA ACTUAL:</h6>
+                    <div id="modal-plantilla" class="mb-4"></div>
+                    <h6 class="text-neon small">ÚLTIMOS RESULTADOS:</h6>
+                    <div id="modal-partidos"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    const cordoba = "https://i.postimg.cc/mDFV530r/584ad528b519ea740933a90a.png";
+    const malaga = "https://i.postimg.cc/BvLBf8TV/Malaga-CF.png";
+    const fiorentina = "https://i.postimg.cc/Hk7rpbN3/ACF-Fiorentina-logo-(Italy-2022)-svg.png";
+    const betis = "https://i.postimg.cc/WpWzg9Ln/Real-Betis.png";
+    const madrid = "https://i.postimg.cc/ZKsfkhk0/Hero-Banner-(Logo).png";
+    const forest = "https://i.postimg.cc/CLnhDSs2/Nottingham-Forest-logo-svg.png";
+    const villarreal = "https://i.postimg.cc/PrDHJKtG/70691.png";
+    const rayo = "https://i.postimg.cc/D0jcK1M5/rayo-vallecano-logo-2.png";
+    const union = "https://i.postimg.cc/htsQZVXD/Emblema-oficial-de-Union-Espanola-svg.png";
+    const monaco = "https://i.postimg.cc/7LZY57sN/monaco-fc-logo-1.png";
+    const valladolid = "https://i.postimg.cc/zXwJpp4K/valladolid-5bb13a4c.png";
+    const cadiz = "https://i.postimg.cc/5N8rZ25G/cadiz-cf-logo-1.png";
+    const inter = "https://i.postimg.cc/wMLW8wNQ/FC-Internazionale-Milano-2021-svg.png";
+    const city = "https://i.postimg.cc/x8DRRLZJ/Manchester-City-FC-badge-svg.png";
+    const palace = "https://i.postimg.cc/q7NxHmVq/Crystal-Palace-FC-logo.png";
+    const leganes = "https://i.postimg.cc/V6jMzpKT/CD-Leganes.png";
+    const getafe = "https://i.postimg.cc/c41YNDwz/Getafe-CF-Logo.png";
+    const leizpig = "https://i.postimg.cc/d1KkNnJC/VEREINFACHTES-LOGO-RB-Leipzig-svg.png";
+    const racing = "https://i.postimg.cc/Y2d0QtLd/racing-f17d2fce.png";
+    const levante = "https://i.postimg.cc/C1mhC45H/levante-ud-logo-escudo.png";
+    const zaragoza = "https://i.postimg.cc/hG0cg09N/vinilos-decorativos-escudo-real-zaragoza.png";
+    const barcelona = "https://i.postimg.cc/2SRDZtTf/FC-Barcelona-(crest)-svg.png";
+
+    const liga1 = [
+        { n: "Obolskinhos", o: "Piñero", pj: 20, g: 14, e: 2, p: 4, dif: 51, pts: 44, img: cordoba },
+        { n: "Er Málaga", o: "Zambrana", pj: 19, g: 14, e: 0, p: 5, dif: 39, pts: 42, img: malaga },
+        { n: "Cara al Gol", o: "Monfo", pj: 19, g: 13, e: 2, p: 4, dif: 35, pts: 38, img: fiorentina },
+        { n: "Pedri Enjoyer", o: "Margulio", pj: 19, g: 10, e: 3, p: 6, dif: 22, pts: 33, img: betis },
+        { n: "Real de Madrid", o: "Zompei", pj: 19, g: 9, e: 4, p: 6, dif: -8, pts: 31, img: madrid },
+        { n: "Aston Birra", o: "Walter", pj: 17, g: 8, e: 3, p: 6, dif: 11, pts: 27, img: forest },
+        { n: "ViaRecta FC", o: "MrPopcorn", pj: 19, g: 7, e: 4, p: 8, dif: 18, pts: 25, img: villarreal },
+        { n: "Teticos de Vallekas", o: "Vitipico", pj: 19, g: 6, e: 3, p: 10, dif: -22, pts: 21, img: rayo },
+        { n: "Unión Española", o: "Jose Sánchez", pj: 20, g: 5, e: 3, p: 12, dif: -26, pts: 18, img: union },
+        { n: "Casinos FC", o: "xDeaD", pj: 20, g: 4, e: 3, p: 13, dif: -43, pts: 15, img: monaco },
+        { n: "Salamanca", o: "Sergio", pj: 17, g: 0, e: 1, p: 16, dif: -77, pts: 1, img: valladolid }
+    ];
+
+    const liga2 = [
+        { n: "AB Taraguilla", o: "Exposito", pj: 19, g: 16, e: 1, p: 2, dif: 47, pts: 49, img: cadiz },
+        { n: "Peeina FC", o: "Jorge", pj: 18, g: 13, e: 2, p: 3, dif: 19, pts: 40, img: inter },
+        { n: "Loluba", o: "Jhonay", pj: 18, g: 11, e: 1, p: 6, dif: -2, pts: 34, img: city },
+        { n: "Bordaletas", o: "Pancho", pj: 20, g: 11, e: 0, p: 9, dif: 18, pts: 33, img: palace },
+        { n: "Nazis FC", o: "Izan Soria", pj: 19, g: 9, e: 1, p: 9, dif: -1, pts: 28, img: leganes },
+        { n: "West Soto", o: "Sunsurfer", pj: 18, g: 8, e: 3, p: 7, dif: -9, pts: 27, img: getafe },
+        { n: "Benjamines", o: "Imulero", pj: 16, g: 8, e: 2, p: 6, dif: -3, pts: 25, img: leizpig },
+        { n: "Sepias FC", o: "Roserito", pj: 18, g: 7, e: 0, p: 11, dif: 10, pts: 21, img: racing },
+        { n: "Valencia CF", o: "Ferbo", pj: 20, g: 5, e: 1, p: 14, dif: -58, pts: 16, img: levante },
+        { n: "Romareda", o: "El Cebollas", pj: 20, g: 4, e: 0, p: 16, dif: -10, pts: 12, img: zaragoza },
+        { n: "Petarderos", o: "Calvirino", pj: 16, g: 3, e: 1, p: 12, dif: -11, pts: 10, img: barcelona }
+    ];
+
+    const jugadores = [
+        { n: "Mbappé", e: "Obolskinhos", g: 25, a: 10, ama: 2, r: 0 },
+        { n: "Haaland", e: "Er Málaga", g: 22, a: 4, ama: 5, r: 1 },
+        { n: "Vini Jr", e: "Er Málaga", g: 15, a: 12, ama: 1, r: 0 }
+    ];
+
+    const noticias = [{ t: "¡Cierre de mercado!", d: "El mercado finaliza este viernes." }];
+    const calendario = [{ p: "Obolskinhos vs Cara al Sol", f: "Mañana 22:00h" }];
+    const matchesHist = [{ l: "Obolskinhos", v: "Er Málaga", res: "3-1", j: "J18" }];
+
+    function cargarTodo() {
+        const drawL = (list, id) => {
+            const table = document.getElementById(id);
+            if (!table) return;
+            table.innerHTML = ""; 
+            list.forEach((eq, i) => {
+                let estiloZona = "";
+                // Reglas 1ª División
+                if (id === 'body-l1') {
+                    if (i === 0) estiloZona = "border-left: 5px solid #00ff88; padding-left: 10px;";
+                    else if (i === 9) estiloZona = "border-left: 5px solid #ffaa00; padding-left: 10px;";
+                    else if (i === 10) estiloZona = "border-left: 5px solid #ff4444; padding-left: 10px;";
+                }
+                // Reglas 2ª División (1º Verde, 2-4 Azul)
+                if (id === 'body-l2') {
+                    if (i === 0) estiloZona = "border-left: 5px solid #00ff88; padding-left: 10px;";
+                    else if (i >= 1 && i <= 3) estiloZona = "border-left: 5px solid #007bff; padding-left: 10px;";
+                }
+
+                table.innerHTML += `<tr class="clickable-team" onclick="verEquipo('${eq.n}')">
+                    <td style="${estiloZona}">${i+1}</td>
+                    <td class="d-flex align-items-center">
+                        <img src="${eq.img}" class="shield-mini"> ${eq.n}
+                    </td>
+                    <td>${eq.pj}</td><td>${eq.g}</td><td>${eq.e}</td><td>${eq.p}</td><td>${eq.dif}</td>
+                    <td class="pts-bold">${eq.pts}</td>
+                </tr>`;
+            });
+        };
+        
+        drawL(liga1, 'body-l1'); 
+        drawL(liga2, 'body-l2');
+        
+        // Stats
+        const gList = document.getElementById('stats-goles');
+        const aList = document.getElementById('stats-asist');
+        const amaList = document.getElementById('stats-ama');
+        const rList = document.getElementById('stats-roja');
+
+        if(gList) jugadores.sort((a,b)=>b.g-a.g).forEach(j => gList.innerHTML += `<div class="stat-card"><span>${j.n}</span><span class="text-neon">${j.g}</span></div>`);
+        if(aList) jugadores.sort((a,b)=>b.a-a.a).forEach(j => aList.innerHTML += `<div class="stat-card"><span>${j.n}</span><span class="text-neon">${j.a}</span></div>`);
+        if(amaList) jugadores.filter(j=>j.ama>0).forEach(j => amaList.innerHTML += `<div class="stat-card"><span>${j.n}</span><span class="badge-yellow">${j.ama}</span></div>`);
+        if(rList) jugadores.filter(j=>j.r>0).forEach(j => rList.innerHTML += `<div class="stat-card"><span>${j.n}</span><span class="badge-red">${j.r}</span></div>`);
+
+        noticias.forEach(n => document.getElementById('lista-noticias').innerHTML += `<div class="match-card"><b>${n.t}</b><br><small>${n.d}</small></div>`);
+        calendario.forEach(c => document.getElementById('lista-calendario').innerHTML += `<div class="match-card"><b>${c.p}</b><br><small>${c.f}</small></div>`);
+    }
+
+    function verEquipo(name) {
+        const eq = [...liga1, ...liga2].find(e => e.n === name);
+        if(!eq) return;
+        document.getElementById('modal-equipo-nombre').innerText = eq.n;
+        document.getElementById('modal-owner').innerText = eq.o;
+        document.getElementById('modal-shield').src = eq.img;
+        const plant = jugadores.filter(j => j.e === name);
+        document.getElementById('modal-plantilla').innerHTML = plant.length ? plant.map(j => `<span class="player-tag">${j.n}</span>`).join('') : "No hay datos.";
+        const hist = matchesHist.filter(m => m.l === name || m.v === name);
+        document.getElementById('modal-partidos').innerHTML = hist.length ? hist.map(m => `<div class="stat-card small"><span>${m.l} ${m.res} ${m.v}</span><span class="text-secondary">${m.j}</span></div>`).join('') : "No hay partidos jugados.";
+        new bootstrap.Modal(document.getElementById('equipoModal')).show();
+    }
+    
+    window.onload = cargarTodo;
+</script>
+</body>
+</html>
