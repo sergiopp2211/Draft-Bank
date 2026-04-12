@@ -200,50 +200,71 @@
     ];
 
     const noticias = [{ t: "¡Cierre de mercado!", d: "El mercado finaliza este viernes." }];
-    const calendario = [{ p: "Obolskinhos vs Cara al Sol", f: "Mañana 22:00h" }];
-    const matchesHist = [{ l: "Obolskinhos", v: "Er Málaga", res: "6-3", j: "J19" }];
+    const calendario = [{ p: "Obolskinhos vs Cara al Gol", f: "Mañana 22:00h" }];
+    const matchesHist = [{ l: "Obolskinhos", v: "Er Málaga", res: "3-1", j: "J18" }];
 
-    const drawL = (list, id) => {
-        const table = document.getElementById(id);
-        if (!table) return;
-        table.innerHTML = ""; 
-        list.forEach((eq, i) => {
-            // --- AQUÍ ESTÁ EL TRUCO DE LOS COLORES ---
-            let estiloZona = "";
-            if (id === 'body-l1') { // Solo para la primera división
-                if (i === 0) estiloZona = "border-left: 5px solid #00ff88; padding-left: 10px;";   // 1º Verde
-                else if (i === 9) estiloZona = "border-left: 5px solid #ffaa00; padding-left: 10px;"; // 10º Naranja
-                else if (i === 10) estiloZona = "border-left: 5px solid #ff4444; padding-left: 10px;"; // 11º Rojo
-            }
+    function cargarTodo() {
+        const drawL = (list, id) => {
+            const table = document.getElementById(id);
+            if (!table) return;
+            table.innerHTML = ""; 
+            list.forEach((eq, i) => {
+                // --- LÓGICA DE COLORES POR ZONA (Solo 1ª División) ---
+                let estiloZona = "";
+                if (id === 'body-l1') {
+                    if (i === 0) estiloZona = "border-left: 5px solid #00ff88; padding-left: 10px;"; // Líder
+                    else if (i === 9) estiloZona = "border-left: 5px solid #ffaa00; padding-left: 10px;"; // 10º
+                    else if (i === 10) estiloZona = "border-left: 5px solid #ff4444; padding-left: 10px;"; // 11º
+                }
 
-            table.innerHTML += `<tr class="clickable-team" onclick="verEquipo('${eq.n}')">
-                <td style="${estiloZona}">${i+1}</td>
-                <td class="d-flex align-items-center">
-                    <img src="${eq.img}" class="shield-mini" style="width:25px; height:25px; margin-right:10px; object-fit:contain;"> 
-                    ${eq.n}
-                </td>
-                <td>${eq.pj}</td><td>${eq.g}</td><td>${eq.e}</td><td>${eq.p}</td><td>${eq.dif}</td>
-                <td class="pts-bold">${eq.pts}</td>
-            </tr>`;
-        });
-    };
+                table.innerHTML += `<tr class="clickable-team" onclick="verEquipo('${eq.n}')">
+                    <td style="${estiloZona}">${i+1}</td>
+                    <td class="d-flex align-items-center">
+                        <img src="${eq.img}" class="shield-mini" style="width:25px; height:25px; margin-right:10px; object-fit:contain;"> 
+                        ${eq.n}
+                    </td>
+                    <td>${eq.pj}</td><td>${eq.g}</td><td>${eq.e}</td><td>${eq.p}</td><td>${eq.dif}</td>
+                    <td class="pts-bold">${eq.pts}</td>
+                </tr>`;
+            });
+        };
         
-        // CORRECCIÓN DE IDS AQUÍ
         drawL(liga1, 'body-l1'); 
         drawL(liga2, 'body-l2');
         
+        // Carga estadísticas
         const gList = document.getElementById('stats-goles');
         const aList = document.getElementById('stats-asist');
         const amaList = document.getElementById('stats-ama');
         const rList = document.getElementById('stats-roja');
 
-        if(gList) jugadores.sort((a,b)=>b.g-a.g).forEach(j => gList.innerHTML += `<div class="stat-card"><span>${j.n}</span><span class="text-neon">${j.g}</span></div>`);
-        if(aList) jugadores.sort((a,b)=>b.a-a.a).forEach(j => aList.innerHTML += `<div class="stat-card"><span>${j.n}</span><span class="text-neon">${j.a}</span></div>`);
-        if(amaList) jugadores.filter(j=>j.ama>0).forEach(j => amaList.innerHTML += `<div class="stat-card"><span>${j.n}</span><span class="badge-yellow">${j.ama}</span></div>`);
-        if(rList) jugadores.filter(j=>j.r>0).forEach(j => rList.innerHTML += `<div class="stat-card"><span>${j.n}</span><span class="badge-red">${j.r}</span></div>`);
+        if(gList) {
+            gList.innerHTML = "";
+            [...jugadores].sort((a,b)=>b.g-a.g).forEach(j => gList.innerHTML += `<div class="stat-card"><span>${j.n}</span><span class="text-neon">${j.g}</span></div>`);
+        }
+        if(aList) {
+            aList.innerHTML = "";
+            [...jugadores].sort((a,b)=>b.a-a.a).forEach(j => aList.innerHTML += `<div class="stat-card"><span>${j.n}</span><span class="text-neon">${j.a}</span></div>`);
+        }
+        if(amaList) {
+            amaList.innerHTML = "";
+            jugadores.filter(j=>j.ama>0).forEach(j => amaList.innerHTML += `<div class="stat-card"><span>${j.n}</span><span class="badge-yellow">${j.ama}</span></div>`);
+        }
+        if(rList) {
+            rList.innerHTML = "";
+            jugadores.filter(j=>j.r>0).forEach(j => rList.innerHTML += `<div class="stat-card"><span>${j.n}</span><span class="badge-red">${j.r}</span></div>`);
+        }
 
-        noticias.forEach(n => document.getElementById('lista-noticias').innerHTML += `<div class="match-card"><b>${n.t}</b><br><small>${n.d}</small></div>`);
-        calendario.forEach(c => document.getElementById('lista-calendario').innerHTML += `<div class="match-card"><b>${c.p}</b><br><small>${c.f}</small></div>`);
+        const nLista = document.getElementById('lista-noticias');
+        const cLista = document.getElementById('lista-calendario');
+        if(nLista) {
+            nLista.innerHTML = "";
+            noticias.forEach(n => nLista.innerHTML += `<div class="match-card"><b>${n.t}</b><br><small>${n.d}</small></div>`);
+        }
+        if(cLista) {
+            cLista.innerHTML = "";
+            calendario.forEach(c => cLista.innerHTML += `<div class="match-card"><b>${c.p}</b><br><small>${c.f}</small></div>`);
+        }
     }
 
     function verEquipo(name) {
@@ -261,6 +282,7 @@
 
         new bootstrap.Modal(document.getElementById('equipoModal')).show();
     }
+    
     window.onload = cargarTodo;
 </script>
 </body>
