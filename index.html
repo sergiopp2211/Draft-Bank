@@ -209,25 +209,41 @@
             if (!table) return;
             table.innerHTML = ""; 
             list.forEach((eq, i) => {
-                // --- LÓGICA DE COLORES POR ZONA (Solo 1ª División) ---
-                let estiloZona = "";
-                if (id === 'body-l1') {
-                    if (i === 0) estiloZona = "border-left: 5px solid #00ff88; padding-left: 10px;"; // Líder
-                    else if (i === 9) estiloZona = "border-left: 5px solid #ffaa00; padding-left: 10px;"; // 10º
-                    else if (i === 10) estiloZona = "border-left: 5px solid #ff4444; padding-left: 10px;"; // 11º
-                }
+                const drawL = (list, id) => {
+    const table = document.getElementById(id);
+    if (!table) return;
+    table.innerHTML = ""; 
+    list.forEach((eq, i) => {
+        let estiloZona = "";
 
-                table.innerHTML += `<tr class="clickable-team" onclick="verEquipo('${eq.n}')">
-                    <td style="${estiloZona}">${i+1}</td>
-                    <td class="d-flex align-items-center">
-                        <img src="${eq.img}" class="shield-mini" style="width:25px; height:25px; margin-right:10px; object-fit:contain;"> 
-                        ${eq.n}
-                    </td>
-                    <td>${eq.pj}</td><td>${eq.g}</td><td>${eq.e}</td><td>${eq.p}</td><td>${eq.dif}</td>
-                    <td class="pts-bold">${eq.pts}</td>
-                </tr>`;
-            });
-        };
+        // REGLAS PARA 1ª DIVISIÓN
+        if (id === 'body-l1') {
+            if (i === 0) estiloZona = "border-left: 5px solid #00ff88; padding-left: 10px;";   // 1º Verde
+            else if (i === 9) estiloZona = "border-left: 5px solid #ffaa00; padding-left: 10px;"; // 10º Naranja
+            else if (i === 10) estiloZona = "border-left: 5px solid #ff4444; padding-left: 10px;"; // 11º Rojo
+        }
+
+        // REGLAS PARA 2ª DIVISIÓN (Aquí está lo que pides)
+        if (id === 'body-l2') {
+            if (i === 0) {
+                estiloZona = "border-left: 5px solid #00ff88; padding-left: 10px;"; // 1º Verde
+            } else if (i >= 1 && i <= 3) { 
+                // Esto pilla la posición 2, 3 y 4 (índices 1, 2 y 3)
+                estiloZona = "border-left: 5px solid #007bff; padding-left: 10px;"; // Azul
+            }
+        }
+
+        table.innerHTML += `<tr class="clickable-team" onclick="verEquipo('${eq.n}')">
+            <td style="${estiloZona}">${i+1}</td>
+            <td class="d-flex align-items-center">
+                <img src="${eq.img}" class="shield-mini" style="width:25px; height:25px; margin-right:10px; object-fit:contain;"> 
+                ${eq.n}
+            </td>
+            <td>${eq.pj}</td><td>${eq.g}</td><td>${eq.e}</td><td>${eq.p}</td><td>${eq.dif}</td>
+            <td class="pts-bold">${eq.pts}</td>
+        </tr>`;
+    });
+};
         
         drawL(liga1, 'body-l1'); 
         drawL(liga2, 'body-l2');
