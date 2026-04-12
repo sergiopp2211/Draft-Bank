@@ -57,7 +57,7 @@
 <div class="container mt-4">
     <ul class="nav nav-tabs" id="myTab" role="tablist">
         <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-l1">1ª DIVISIÓN</button></li>
-        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-l2">F2 (MINI)</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-l2">2ª DIVISIÓN</button></li>
         <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-copa">COPA</button></li>
         <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-stats">ESTADÍSTICAS</button></li>
         <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-cal">CALENDARIO & NOTICIAS</button></li>
@@ -152,6 +152,18 @@
     const union = "https://i.postimg.cc/PrDHJKtG/70691.png";
     const monaco = "https://i.postimg.cc/7LZY57sN/monaco-fc-logo-1.png";
     const valladolid = "https://i.postimg.cc/zXwJpp4K/valladolid-5bb13a4c.png";
+    const cadiz = "https://i.postimg.cc/5N8rZ25G/cadiz-cf-logo-1.png";
+    const inter = "https://i.postimg.cc/wMLW8wNQ/FC-Internazionale-Milano-2021-svg.png";
+    const city = "https://i.postimg.cc/x8DRRLZJ/Manchester-City-FC-badge-svg.png";
+    const palace = "https://i.postimg.cc/q7NxHmVq/Crystal-Palace-FC-logo.png";
+    const leganes = "https://i.postimg.cc/V6jMzpKT/CD-Leganes.png";
+    const getafe = "https://i.postimg.cc/c41YNDwz/Getafe-CF-Logo.png";
+    const leizpig = "https://i.postimg.cc/d1KkNnJC/VEREINFACHTES-LOGO-RB-Leipzig-svg.png";
+    const racing = "https://i.postimg.cc/Y2d0QtLd/racing-f17d2fce.png";
+    const levante = "https://i.postimg.cc/C1mhC45H/levante-ud-logo-escudo.png";
+    const zaragoza = "https://i.postimg.cc/hG0cg09N/vinilos-decorativos-escudo-real-zaragoza.png";
+    const barcelona = "https://i.postimg.cc/2SRDZtTf/FC-Barcelona-(crest)-svg.png";
+
 
     const liga1 = [
         { n: "Obolskinhos", o: "Piñero", pj: 20, g: 14, e: 2, p: 4, dif: 51, pts: 44, img: cordoba },
@@ -168,17 +180,17 @@
     ];
 
     const liga2 = [
-        { n: "AB Taraguilla", o: "Exposito", pj: 19, g: 16, e: 1, p: 2, dif: 47, pts: 49, img: defShield },
-        { n: "Peeina FC", o: "Jorge", pj: 18, g: 13, e: 2, p: 3, dif: 19, pts: 40, img: defShield },
-        { n: "Loluba", o: "Jhonay", pj: 18, g: 11, e: 1, p: 6, dif: -2, pts: 34, img: defShield },
-        { n: "Bordaletas", o: "Pancho", pj: 20, g: 11, e: 0, p: 9, dif: 18, pts: 33, img: defShield },
-        { n: "Nazis FC", o: "Izan Soria", pj: 19, g: 9, e: 1, p: 9, dif: -1, pts: 28, img: defShield },
-        { n: "West Soto", o: "Sunsurfer", pj: 18, g: 8, e: 3, p: 7, dif: -9, pts: 27, img: defShield },
-        { n: "Benjamines", o: "Imulero", pj: 16, g: 8, e: 2, p: 6, dif: -3, pts: 25, img: defShield },
-        { n: "Sepias FC", o: "Reserva", pj: 18, g: 7, e: 0, p: 11, dif: 10, pts: 21, img: defShield },
-        { n: "Valencia CF", o: "Ferbo", pj: 20, g: 5, e: 1, p: 14, dif: -58, pts: 16, img: defShield },
-        { n: "Romareda", o: "El Cebollas", pj: 20, g: 4, e: 0, p: 16, dif: -10, pts: 12, img: defShield },
-        { n: "Petarderos", o: "Roserito", pj: 16, g: 3, e: 1, p: 12, dif: -11, pts: 10, img: defShield }
+        { n: "AB Taraguilla", o: "Exposito", pj: 19, g: 16, e: 1, p: 2, dif: 47, pts: 49, img: cdiz },
+        { n: "Peeina FC", o: "Jorge", pj: 18, g: 13, e: 2, p: 3, dif: 19, pts: 40, img: inter },
+        { n: "Loluba", o: "Jhonay", pj: 18, g: 11, e: 1, p: 6, dif: -2, pts: 34, img: city },
+        { n: "Bordaletas", o: "Pancho", pj: 20, g: 11, e: 0, p: 9, dif: 18, pts: 33, img: palace },
+        { n: "Nazis FC", o: "Izan Soria", pj: 19, g: 9, e: 1, p: 9, dif: -1, pts: 28, img: leganes },
+        { n: "West Soto", o: "Sunsurfer", pj: 18, g: 8, e: 3, p: 7, dif: -9, pts: 27, img: getafe },
+        { n: "Benjamines", o: "Imulero", pj: 16, g: 8, e: 2, p: 6, dif: -3, pts: 25, img: leizpig },
+        { n: "Sepias FC", o: "Roserito", pj: 18, g: 7, e: 0, p: 11, dif: 10, pts: 21, img: racing },
+        { n: "Valencia CF", o: "Ferbo", pj: 20, g: 5, e: 1, p: 14, dif: -58, pts: 16, img: levante },
+        { n: "Romareda", o: "El Cebollas", pj: 20, g: 4, e: 0, p: 16, dif: -10, pts: 12, img: zaragoza },
+        { n: "Petarderos", o: "Calvirino", pj: 16, g: 3, e: 1, p: 12, dif: -11, pts: 10, img: barcelona }
     ];
 
     const jugadores = [
