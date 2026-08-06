@@ -423,18 +423,8 @@
   .cc-stage{ margin-bottom:18px; }
   .cc-stage h4{ font-family:'Cinzel',serif; font-size:11px; letter-spacing:0.14em; color:var(--gold-dim); text-transform:uppercase; margin:0 0 8px; border-bottom:1px solid var(--panel-line); padding-bottom:5px; }
   .cc-row{ display:flex; align-items:center; justify-content:center; gap:8px; font-size:12.5px; color:var(--text-dim); padding:4px 0; text-align:center; }
-  .cc-row .ccteam{ display:inline-flex; align-items:center; gap:5px; }
   .cc-row .ccw{ color:var(--gold-soft); font-weight:800; }
   .cc-row .ccarrow{ color:var(--gold-dim); font-size:11px; }
-  .cc-flag{ width:16px; height:11px; object-fit:cover; border-radius:2px; box-shadow:0 0 0 1px rgba(212,175,55,0.3); flex-shrink:0; background:var(--panel-alt); }
-  .cc-flag-lg{ width:34px; height:23px; object-fit:cover; border-radius:3px; box-shadow:0 0 0 1px rgba(212,175,55,0.35); margin:6px auto 4px; display:block; background:var(--panel-alt); }
-  .cc-groupwinners{ margin-bottom:22px; }
-  .cc-group-grid{ display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; }
-  .cc-group-item{ border:1px solid var(--panel-line); border-radius:7px; padding:8px 4px 9px; text-align:center; background:var(--panel); }
-  .cc-group-tag{ display:block; font-family:'Cinzel',serif; font-size:9px; letter-spacing:0.1em; color:var(--gold-dim); text-transform:uppercase; margin-bottom:3px; }
-  .cc-group-team{ display:block; font-size:11px; font-weight:700; color:var(--text); line-height:1.2; }
-  .cc-group-team.pending{ color:var(--text-faint); font-weight:500; font-style:italic; font-size:10px; margin-top:4px; }
-  .cc-group-owner{ display:block; font-size:9.5px; color:var(--text-faint); margin-top:1px; }
   .cc-podium{ margin-top:26px; display:flex; flex-direction:column; gap:10px; }
   .cc-place{ border:1px solid var(--panel-line); border-radius:8px; padding:12px 14px; text-align:center; background:var(--panel); }
   .cc-place.champ{ border-color:var(--gold); box-shadow:0 0 24px rgba(212,175,55,0.18); }
@@ -549,7 +539,7 @@
     </div>
 
     <div class="cloud-banner" id="cloudBanner">
-      ⚠ <strong>Modo local (sin sincronización global):</strong> no se ha podido conectar con la base de datos en la nube (revisa tu conexión a internet, que no haya un bloqueador de anuncios/extensión impidiendo cargar <code>gstatic.com</code>, y que las reglas de tu Realtime Database permitan lectura/escritura). Mientras tanto, los cambios solo se guardan en este dispositivo.
+      ⚠ <strong>Modo local (sin sincronización global):</strong> este navegador no tiene configurada la base de datos en la nube, así que los cambios solo se guardan en este dispositivo. Abre el código fuente y rellena el objeto <code>firebaseConfig</code> con los datos de tu proyecto gratuito de Firebase (ver instrucciones en el comentario junto a <code>firebaseConfig</code>) para que todos los usuarios vean los mismos resultados al instante.
     </div>
 
     <section class="block" id="live-grupos">
@@ -568,7 +558,6 @@
         <div class="matches-row" id="live-row-previa"></div>
       </div>
       <div class="chevron-divider">▾</div>
-
       <div class="stage" id="live-stage-cuartos">
         <div class="stage-head"><span class="chip">Cuartos</span><h3>Cuartos de Final</h3><span class="stage-rule"></span></div>
         <div class="matches-row" id="live-row-cuartos"></div>
@@ -689,47 +678,49 @@
 <div class="clean-capture" id="predCleanCapture"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" onerror="window.__h2cLoadFailed = true;"></script>
-<script type="module">
-// Importa Firebase (SDK modular v10)
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
-import { getDatabase, ref, set, onValue } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js';
-// Nota: de tu snippet original quité 'get' y 'child' porque esta app no los usa
-// (todo se lee mediante 'onValue', que sí necesitamos para la sincronización en
-// tiempo real), y añadí 'onValue' por ese mismo motivo.
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js" onerror="window.__fbLoadFailed = true;"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js" onerror="window.__fbLoadFailed = true;"></script>
+<script>
 (function(){
   "use strict";
 
   /* =====================================================================
-     SINCRONIZACIÓN EN LA NUBE (Firebase Realtime Database)
+     SINCRONIZACIÓN EN LA NUBE (Firebase Realtime Database — capa gratuita)
      =====================================================================
-     Conectado a tu proyecto "draft-bank" con tus credenciales exactas,
-     incluida tu databaseURL:
-       https://draft-bank-default-rtdb.firebaseio.com
-
-     Solo falta un paso en la consola de Firebase (si no lo has hecho ya):
-     en Realtime Database → pestaña "Reglas", deja esto para que cualquier
-     usuario pueda leer y escribir sin necesidad de iniciar sesión (es una
-     app privada de amigos, sin datos sensibles):
-       { "rules": { ".read": true, ".write": true } }
-     Si las reglas se quedan en el modo de prueba por defecto, funcionará
-     igual durante 30 días y luego se bloqueará la escritura — por eso
-     conviene dejarlas así de forma permanente.
+     PASOS PARA ACTIVARLA (5 minutos, sin tarjeta de crédito):
+       1. Ve a https://console.firebase.google.com y crea un proyecto nuevo
+          (plan gratuito "Spark").
+       2. En el menú lateral entra en "Compilación" → "Realtime Database"
+          → "Crear base de datos". Elige la ubicación y arranca en
+          "modo de prueba" (permite lectura/escritura pública durante 30
+          días; luego, en la pestaña "Reglas", puedes dejar simplemente:
+             { "rules": { ".read": true, ".write": true } }
+          — es una app privada de amigos, no maneja datos sensibles).
+       3. En "Configuración del proyecto" (icono ⚙) → "General" → baja
+          hasta "Tus apps" → pulsa el icono </> para añadir una app web.
+          Copia el objeto de configuración que te da Firebase.
+       4. Pega esos valores AQUÍ ABAJO, sustituyendo el objeto de ejemplo.
+       5. Guarda el archivo y súbelo a GitHub. ¡Listo! Todos los que abran
+          la web verán y editarán los mismos datos en tiempo real.
+     Si dejas los valores de ejemplo tal cual, la app sigue funcionando
+     con normalidad pero en "modo local": solo se guarda en este navegador
+     (verás un aviso ámbar arriba de la pestaña "En Directo").
   ===================================================================== */
   const firebaseConfig = {
-    apiKey: 'AIzaSyAr0qfT30vdTI0dHjdHjDsEnW9KGuSub69Z6c',
-    authDomain: 'draft-bank.firebaseapp.com',
-    databaseURL: 'https://draft-bank-default-rtdb.firebaseio.com',
-    projectId: 'draft-bank',
-    storageBucket: 'draft-bank.firebasestorage.app',
-    messagingSenderId: '986221469100',
-    appId: '1:986221469100:web:e1f8c1dc0fd71535d36e09',
-    measurementId: 'G-YGTZ76S3DY'
+    apiKey: "YOUR_API_KEY_HERE",
+    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+    databaseURL: "https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT_ID.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
   };
   const CLOUD_PATH = 'torneoMundialCampeones/live';
-  const CLOUD_ENABLED = !!(firebaseConfig.databaseURL && firebaseConfig.databaseURL.indexOf('PON_AQUI') === -1);
+  const CLOUD_ENABLED = firebaseConfig.apiKey && firebaseConfig.apiKey.indexOf('YOUR_API_KEY') === -1;
 
   let cloudDbRef = null;
   let cloudReady = false;
+  let suppressNextLocalEcho = false;
 
   function setCloudStatus(mode, text){
     const badge = document.getElementById('cloudStatus');
@@ -750,35 +741,18 @@ import { getDatabase, ref, set, onValue } from 'https://www.gstatic.com/firebase
   const LOCAL_FALLBACK_KEY = 'torneoMundialCampeones_live_v1';
   const LiveStore = {
     init(onData){
-      if(CLOUD_ENABLED){
+      if(CLOUD_ENABLED && typeof firebase !== 'undefined'){
         try{
-          const app = initializeApp(firebaseConfig);
-          const db = getDatabase(app);
-          cloudDbRef = ref(db, CLOUD_PATH);
+          firebase.initializeApp(firebaseConfig);
+          cloudDbRef = firebase.database().ref(CLOUD_PATH);
           setCloudStatus('local', 'Conectando…');
-          // Si en 7s no hemos recibido respuesta de Firebase (típico si la
-          // página se abre dentro de una vista previa/sandbox que bloquea
-          // conexiones salientes, o si hay un firewall/extensión de por
-          // medio), avisamos con un mensaje claro en vez de dejar
-          // "Conectando…" colgado para siempre. El listener sigue activo:
-          // si la conexión llega más tarde, el estado se actualiza solo.
-          const connectTimeout = setTimeout(function(){
-            if(!cloudReady){
-              setCloudStatus('err', 'Sin respuesta de la nube — abre el archivo fuera de esta vista previa');
-              showCloudBanner(true);
-            }
-          }, 7000);
-          onValue(cloudDbRef, function(snap){
-            clearTimeout(connectTimeout);
+          cloudDbRef.on('value', function(snap){
             cloudReady = true;
             setCloudStatus('ok', 'Sincronizado en la nube');
-            showCloudBanner(false);
             onData(snap.val());
           }, function(err){
-            clearTimeout(connectTimeout);
             console.error('Firebase error:', err);
-            setCloudStatus('err', 'Error de conexión: ' + (err && err.message ? err.message : 'revisa las reglas de tu base de datos'));
-            showCloudBanner(true);
+            setCloudStatus('err', 'Error de conexión — reintentando');
           });
         }catch(err){
           console.error('No se pudo iniciar Firebase:', err);
@@ -787,7 +761,7 @@ import { getDatabase, ref, set, onValue } from 'https://www.gstatic.com/firebase
           this._initLocalOnly(onData);
         }
       } else {
-        setCloudStatus('local', 'Modo local (falta databaseURL en firebaseConfig)');
+        setCloudStatus('local', 'Modo local (sin nube configurada)');
         showCloudBanner(true);
         this._initLocalOnly(onData);
       }
@@ -804,7 +778,7 @@ import { getDatabase, ref, set, onValue } from 'https://www.gstatic.com/firebase
     },
     write(data){
       if(CLOUD_ENABLED && cloudDbRef){
-        set(cloudDbRef, data).catch(function(err){
+        cloudDbRef.set(data).catch(function(err){
           console.error('Error guardando en la nube:', err);
           setCloudStatus('err', 'No se pudo guardar — revisa tu conexión');
         });
@@ -1093,11 +1067,6 @@ import { getDatabase, ref, set, onValue } from 'https://www.gstatic.com/firebase
         h = Number(sc.home); a = Number(sc.away);
         if(!Number.isNaN(h) && !Number.isNaN(a)){
           hasScores = true;
-          // IMPORTANTE: 'side' debe ir al final del Object.assign. teamA/teamB pueden ser
-          // el objeto "winner" de una ronda anterior (ya trae su propio campo .side de
-          // aquel cruce), así que si lo ponemos primero, esa propiedad vieja pisa el 'A'/'B'
-          // que corresponde a ESTE partido y el resaltado de ganador queda desincronizado
-          // del marcador (y del cartel de campeón, que sí usa .name correctamente).
           if(h>a) winner = Object.assign({}, teamA, {side:'A'});
           else if(a>h) winner = Object.assign({}, teamB, {side:'B'});
           else {
@@ -1113,7 +1082,7 @@ import { getDatabase, ref, set, onValue } from 'https://www.gstatic.com/firebase
   }
 
   function updateKnockout(ns){
-    const { results, standingsByGroup } = computeKnockoutResults(ns);
+    const { results } = computeKnockoutResults(ns);
 
     ALL_KO_MATCHES.forEach(m=>{
       const uid = ns+'-'+m.id;
@@ -1148,7 +1117,6 @@ import { getDatabase, ref, set, onValue } from 'https://www.gstatic.com/firebase
       sideB.classList.toggle('pending', !teamB);
       scoreA.disabled = !(teamA && teamB) || lockedForViewer;
       scoreB.disabled = !(teamA && teamB) || lockedForViewer;
-
       sideA.classList.remove('winner','loser');
       sideB.classList.remove('winner','loser');
       if(winner){
@@ -1188,47 +1156,27 @@ import { getDatabase, ref, set, onValue } from 'https://www.gstatic.com/firebase
       banner.classList.remove('show');
     }
 
-    if(ns === 'pred') buildCleanSummary(results, standingsByGroup);
+    if(ns === 'pred') buildCleanSummary(results);
   }
 
   /* ---------------- CLEAN SUMMARY (prediction download) ---------------- */
-  function ccTeamSpan(team, isWinner){
-    if(!team) return '<span class="ccteam">Pendiente</span>';
-    const flagImg = team.flag ? '<img class="cc-flag" src="'+flagUrl(team.flag)+'" alt="" crossorigin="anonymous">' : '';
-    return '<span class="ccteam'+(isWinner?' ccw':'')+'">'+flagImg+'<span>'+team.name+'</span></span>';
-  }
-
   function ccRow(r){
+    const aName = r.teamA ? r.teamA.name : 'Pendiente';
+    const bName = r.teamB ? r.teamB.name : 'Pendiente';
     const aWin = r.winner && r.winner.side==='A';
     const bWin = r.winner && r.winner.side==='B';
     return '<div class="cc-row">' +
-      ccTeamSpan(r.teamA, aWin) +
+      '<span class="'+(aWin?'ccw':'')+'">'+aName+'</span>' +
       '<span class="ccarrow">vs</span>' +
-      ccTeamSpan(r.teamB, bWin) +
+      '<span class="'+(bWin?'ccw':'')+'">'+bName+'</span>' +
     '</div>';
   }
 
-  function buildCleanSummary(results, standingsByGroup){
+  function buildCleanSummary(results){
     const cc = document.getElementById('predCleanCapture');
     let html = '<div class="cc-eyebrow">Mi Predicción · Torneo Mundial de Campeones</div>' +
       '<div class="cc-title">Resumen Final</div>' +
       '<div class="cc-divider"></div>';
-
-    if(standingsByGroup){
-      html += '<div class="cc-stage cc-groupwinners"><h4>Ganadores de Grupo</h4><div class="cc-group-grid">';
-      groupsData.forEach(g=>{
-        const winner = standingsByGroup[g.id] && standingsByGroup[g.id][0];
-        html += '<div class="cc-group-item">' +
-          '<span class="cc-group-tag">GRUPO '+g.id+'</span>' +
-          (winner ? (
-            '<img class="cc-flag-lg" src="'+flagUrl(winner.flag)+'" alt="'+winner.name+'" crossorigin="anonymous">' +
-            '<span class="cc-group-team">'+winner.name+'</span>' +
-            '<span class="cc-group-owner">'+winner.owner+'</span>'
-          ) : '<span class="cc-group-team pending">Por definir</span>') +
-        '</div>';
-      });
-      html += '</div></div>';
-    }
 
     ['previa','cuartos','semis','final'].forEach(stageKey=>{
       html += '<div class="cc-stage"><h4>'+STAGE_LABELS[stageKey]+'</h4>';
@@ -1240,8 +1188,7 @@ import { getDatabase, ref, set, onValue } from 'https://www.gstatic.com/firebase
     html += '<div class="cc-podium">';
     if(finalRes && finalRes.winner){
       const champ = finalRes.winner;
-      const champFlag = champ.flag ? '<img class="cc-flag-lg" src="'+flagUrl(champ.flag)+'" alt="'+champ.name+'" crossorigin="anonymous">' : '';
-      html += '<div class="cc-place champ"><div class="cctag">🏆 Equipo Ganador</div>'+champFlag+'<div class="ccname">'+champ.name+'</div><div class="ccowner">'+champ.owner+'</div></div>';
+      html += '<div class="cc-place champ"><div class="cctag">🏆 Equipo Ganador</div><div class="ccname">'+champ.name+'</div><div class="ccowner">'+champ.owner+'</div></div>';
     } else {
       html += '<div class="cc-place"><div class="cctag">Torneo en curso</div><div class="ccname">Completa la Gran Final para conocer al ganador</div></div>';
     }
@@ -1562,14 +1509,6 @@ import { getDatabase, ref, set, onValue } from 'https://www.gstatic.com/firebase
         const awayInp = document.querySelector('.score-input[data-key="'+key+'"][data-side="away"][data-ns="'+ns+'"]');
         if(homeInp) homeInp.value = '';
         if(awayInp) awayInp.value = '';
-        // También borramos las estadísticas de jugadores (goles, asistencias,
-        // amarillas, rojas) que se hubieran registrado para este partido —
-        // si no, quedaban "huérfanas" en el marcador de estadísticas.
-        if(ns==='live' && adminStats.matches[key]){
-          delete adminStats.matches[key];
-          renderMatchAdminEntries(key);
-          renderPlayerLeaderboards();
-        }
         refreshAllStandings(ns);
         updateKnockout(ns);
         renderAutoGoalStats();
@@ -1586,15 +1525,6 @@ import { getDatabase, ref, set, onValue } from 'https://www.gstatic.com/firebase
         const scoreB = document.getElementById(uid+'-B-score');
         if(scoreA) scoreA.value = '';
         if(scoreB) scoreB.value = '';
-        // Las estadísticas de jugadores de un cruce de eliminatorias se
-        // guardan bajo la clave "K-<idPartido>" (ver adminBlockHtml). Hay
-        // que borrarlas también al borrar el resultado del cruce.
-        const statsKey = 'K-'+matchId;
-        if(ns==='live' && adminStats.matches[statsKey]){
-          delete adminStats.matches[statsKey];
-          renderMatchAdminEntries(statsKey);
-          renderPlayerLeaderboards();
-        }
         updateKnockout(ns);
         renderAutoGoalStats();
         flushCloudPush();
