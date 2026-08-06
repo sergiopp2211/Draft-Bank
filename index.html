@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Torneo Mundial de Campeones — Panel Completo</title>
+<title>Torneo Mundial de Campeones — Panel Completo (Sincronizado)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -298,6 +298,66 @@
   .admin-status{ font-size:11.5px; color:var(--text-faint); }
   body.admin-mode .admin-status{ color:var(--win-green); font-weight:700; }
 
+  /* ---------- CLOUD SYNC STATUS ---------- */
+  .cloud-status{
+    display:inline-flex; align-items:center; gap:6px;
+    font-size:11px; color:var(--text-faint); font-family:'Manrope',sans-serif; font-weight:600;
+    padding:6px 10px; border-radius:14px; border:1px solid var(--panel-line); background:var(--void);
+  }
+  .cloud-status .dot{ width:7px; height:7px; border-radius:50%; background:var(--text-faint); flex-shrink:0; }
+  .cloud-status.ok .dot{ background:var(--win-green); box-shadow:0 0 6px var(--win-green); }
+  .cloud-status.ok{ color:var(--win-green); border-color:rgba(63,143,107,0.4); }
+  .cloud-status.local .dot{ background:var(--bronze); box-shadow:0 0 6px var(--bronze); }
+  .cloud-status.local{ color:var(--bronze); border-color:rgba(201,138,75,0.4); }
+  .cloud-status.err .dot{ background:var(--lose-red); box-shadow:0 0 6px var(--lose-red); }
+  .cloud-status.err{ color:#e08a8a; border-color:rgba(138,63,63,0.5); }
+  .cloud-banner{
+    display:none;
+    background:rgba(201,138,75,0.10); border:1px solid rgba(201,138,75,0.35); border-radius:8px;
+    padding:10px 14px; font-size:12px; color:var(--bronze); margin-bottom:20px; line-height:1.5;
+  }
+  .cloud-banner.show{ display:block; }
+  .cloud-banner code{ background:rgba(0,0,0,0.35); padding:1px 6px; border-radius:4px; color:var(--gold-soft); }
+
+  /* ---------- ADMIN-ONLY EDIT LOCK (Tab En Directo) ---------- */
+  body:not(.admin-mode) #tab-live input.score-input,
+  body:not(.admin-mode) #tab-live input.kscore,
+  body:not(.admin-mode) #tab-live .pbtn,
+  body:not(.admin-mode) #tab-live .score-clear-btn,
+  body:not(.admin-mode) #tab-live .kmatch-clear-btn{
+    pointer-events:none; opacity:0.45; cursor:not-allowed;
+  }
+
+  /* ---------- CLEAR / DELETE (papelera) BUTTONS ---------- */
+  .score-clear-btn{
+    display:none; align-items:center; justify-content:center;
+    width:22px; height:22px; margin-left:4px;
+    background:none; border:1px solid var(--panel-line); border-radius:6px;
+    color:var(--text-faint); cursor:pointer; font-size:11px; flex-shrink:0;
+  }
+  body.admin-mode .score-clear-btn{ display:inline-flex; }
+  .score-clear-btn:hover{ border-color:var(--lose-red); color:#e08a8a; }
+  .match-row-wrap{ display:flex; align-items:center; gap:2px; }
+  .match-row-wrap .match-row{ flex:1; }
+
+  .kmatch-clear-btn{
+    display:none; align-items:center; gap:5px; justify-content:center;
+    width:100%; margin-top:10px; padding:6px 0;
+    background:none; border:1px dashed var(--panel-line); border-radius:6px;
+    color:var(--text-faint); cursor:pointer; font-size:10.5px; font-family:'Manrope',sans-serif; font-weight:700;
+  }
+  body.admin-mode .kmatch-clear-btn{ display:flex; }
+  .kmatch-clear-btn:hover{ border-color:var(--lose-red); color:#e08a8a; }
+
+  /* ---------- LOAD LIVE INTO PREDICTION ---------- */
+  .pred-load-wrap{ text-align:center; margin: 0 0 30px; }
+  .load-live-btn{
+    background:none; border:1px solid var(--gold-dim); color:var(--gold-soft);
+    font-family:'Manrope',sans-serif; font-weight:700; font-size:12.5px;
+    padding:11px 20px; border-radius:24px; cursor:pointer; letter-spacing:0.02em;
+  }
+  .load-live-btn:hover{ border-color:var(--gold); background:rgba(212,175,55,0.08); }
+
   .admin-block{ display:none; margin-top:10px; }
   body.admin-mode .admin-block{ display:block; }
   .admin-match-btn{
@@ -475,6 +535,11 @@
         <button class="admin-login-btn" id="adminSubmitBtn">Entrar</button>
       </div>
       <span class="admin-status" id="adminStatusText"></span>
+      <span class="cloud-status" id="cloudStatus" style="margin-left:auto;"><span class="dot"></span><span id="cloudStatusText">Conectando…</span></span>
+    </div>
+
+    <div class="cloud-banner" id="cloudBanner">
+      ⚠ <strong>Modo local (sin sincronización global):</strong> este navegador no tiene configurada la base de datos en la nube, así que los cambios solo se guardan en este dispositivo. Abre el código fuente y rellena el objeto <code>firebaseConfig</code> con los datos de tu proyecto gratuito de Firebase (ver instrucciones en el comentario junto a <code>firebaseConfig</code>) para que todos los usuarios vean los mismos resultados al instante.
     </div>
 
     <section class="block" id="live-grupos">
@@ -518,7 +583,10 @@
   <div class="tab-panel" id="tab-pred">
     <section class="block" id="pred-grupos">
       <div class="block-title"><span class="idx">I.</span><h2>Fase de Grupos — Mi Predicción</h2><span class="rule"></span></div>
-      <p class="block-note">Simula tu propia fase de grupos. Estos marcadores son solo tuyos y no afectan al torneo en directo.</p>
+      <p class="block-note">Simula tu propia fase de grupos. Estos marcadores son solo tuyos y no afectan al torneo en directo. Se guardan automáticamente en este navegador.</p>
+      <div class="pred-load-wrap">
+        <button type="button" class="load-live-btn" id="loadLiveBtn">⬇ Cargar resultados actuales en directo</button>
+      </div>
       <div class="groups-grid" id="pred-groupsGrid"></div>
     </section>
 
@@ -611,9 +679,116 @@
 <div class="clean-capture" id="predCleanCapture"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" onerror="window.__h2cLoadFailed = true;"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js" onerror="window.__fbLoadFailed = true;"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js" onerror="window.__fbLoadFailed = true;"></script>
 <script>
 (function(){
   "use strict";
+
+  /* =====================================================================
+     SINCRONIZACIÓN EN LA NUBE (Firebase Realtime Database — capa gratuita)
+     =====================================================================
+     PASOS PARA ACTIVARLA (5 minutos, sin tarjeta de crédito):
+       1. Ve a https://console.firebase.google.com y crea un proyecto nuevo
+          (plan gratuito "Spark").
+       2. En el menú lateral entra en "Compilación" → "Realtime Database"
+          → "Crear base de datos". Elige la ubicación y arranca en
+          "modo de prueba" (permite lectura/escritura pública durante 30
+          días; luego, en la pestaña "Reglas", puedes dejar simplemente:
+             { "rules": { ".read": true, ".write": true } }
+          — es una app privada de amigos, no maneja datos sensibles).
+       3. En "Configuración del proyecto" (icono ⚙) → "General" → baja
+          hasta "Tus apps" → pulsa el icono </> para añadir una app web.
+          Copia el objeto de configuración que te da Firebase.
+       4. Pega esos valores AQUÍ ABAJO, sustituyendo el objeto de ejemplo.
+       5. Guarda el archivo y súbelo a GitHub. ¡Listo! Todos los que abran
+          la web verán y editarán los mismos datos en tiempo real.
+     Si dejas los valores de ejemplo tal cual, la app sigue funcionando
+     con normalidad pero en "modo local": solo se guarda en este navegador
+     (verás un aviso ámbar arriba de la pestaña "En Directo").
+  ===================================================================== */
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY_HERE",
+    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+    databaseURL: "https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT_ID.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+  };
+  const CLOUD_PATH = 'torneoMundialCampeones/live';
+  const CLOUD_ENABLED = firebaseConfig.apiKey && firebaseConfig.apiKey.indexOf('YOUR_API_KEY') === -1;
+
+  let cloudDbRef = null;
+  let cloudReady = false;
+  let suppressNextLocalEcho = false;
+
+  function setCloudStatus(mode, text){
+    const badge = document.getElementById('cloudStatus');
+    const label = document.getElementById('cloudStatusText');
+    if(!badge || !label) return;
+    badge.className = 'cloud-status ' + mode;
+    label.textContent = text;
+  }
+
+  function showCloudBanner(show){
+    const b = document.getElementById('cloudBanner');
+    if(b) b.classList.toggle('show', show);
+  }
+
+  // Abstracción de almacenamiento: usa Firebase si está configurado,
+  // si no, hace fallback a localStorage (+ sincroniza entre pestañas
+  // abiertas en el mismo navegador mediante el evento 'storage').
+  const LOCAL_FALLBACK_KEY = 'torneoMundialCampeones_live_v1';
+  const LiveStore = {
+    init(onData){
+      if(CLOUD_ENABLED && typeof firebase !== 'undefined'){
+        try{
+          firebase.initializeApp(firebaseConfig);
+          cloudDbRef = firebase.database().ref(CLOUD_PATH);
+          setCloudStatus('local', 'Conectando…');
+          cloudDbRef.on('value', function(snap){
+            cloudReady = true;
+            setCloudStatus('ok', 'Sincronizado en la nube');
+            onData(snap.val());
+          }, function(err){
+            console.error('Firebase error:', err);
+            setCloudStatus('err', 'Error de conexión — reintentando');
+          });
+        }catch(err){
+          console.error('No se pudo iniciar Firebase:', err);
+          setCloudStatus('err', 'Error de configuración de Firebase');
+          showCloudBanner(true);
+          this._initLocalOnly(onData);
+        }
+      } else {
+        setCloudStatus('local', 'Modo local (sin nube configurada)');
+        showCloudBanner(true);
+        this._initLocalOnly(onData);
+      }
+    },
+    _initLocalOnly(onData){
+      let raw = null;
+      try{ raw = localStorage.getItem(LOCAL_FALLBACK_KEY); }catch(e){}
+      onData(raw ? JSON.parse(raw) : null);
+      window.addEventListener('storage', function(e){
+        if(e.key === LOCAL_FALLBACK_KEY){
+          onData(e.newValue ? JSON.parse(e.newValue) : null);
+        }
+      });
+    },
+    write(data){
+      if(CLOUD_ENABLED && cloudDbRef){
+        cloudDbRef.set(data).catch(function(err){
+          console.error('Error guardando en la nube:', err);
+          setCloudStatus('err', 'No se pudo guardar — revisa tu conexión');
+        });
+      } else {
+        try{ localStorage.setItem(LOCAL_FALLBACK_KEY, JSON.stringify(data)); }
+        catch(e){ console.warn('No se pudo guardar localmente.', e); }
+      }
+    }
+  };
 
   /* ---------------- DATA ---------------- */
   const groupsData = [
@@ -742,14 +917,18 @@
         const adminHtml = ns==='live'
           ? adminBlockHtml(key, teamOptionHtml(home.name, home.owner) + teamOptionHtml(away.name, away.owner))
           : '';
+        const clearBtn = ns==='live'
+          ? '<button type="button" class="score-clear-btn" data-ns="'+ns+'" data-clearkey="'+key+'" title="Borrar resultado">🗑</button>'
+          : '';
         return (
+          '<div class="match-row-wrap">' +
           '<div class="match-row">' +
             '<span class="match-team home">'+home.name+'<img class="flag-icon-sm" alt="" crossorigin="anonymous" src="'+flagUrl(home.flag)+'"></span>' +
-            '<input type="number" min="0" placeholder="-" class="score-input" data-key="'+key+'" data-side="home">' +
+            '<input type="number" min="0" placeholder="-" class="score-input" data-key="'+key+'" data-side="home" data-ns="'+ns+'">' +
             '<span class="match-vs">–</span>' +
-            '<input type="number" min="0" placeholder="-" class="score-input" data-key="'+key+'" data-side="away">' +
+            '<input type="number" min="0" placeholder="-" class="score-input" data-key="'+key+'" data-side="away" data-ns="'+ns+'">' +
             '<span class="match-team away"><img class="flag-icon-sm" alt="" crossorigin="anonymous" src="'+flagUrl(away.flag)+'">'+away.name+'</span>' +
-          '</div>' + adminHtml
+          '</div>' + clearBtn + '</div>' + adminHtml
         );
       }).join('');
 
@@ -766,12 +945,14 @@
 
     grid.querySelectorAll('.score-input').forEach(inp=>{
       inp.addEventListener('input', function(e){
+        if(ns==='live' && !isAdmin) return;
         const key = e.target.dataset.key, side = e.target.dataset.side;
         if(!state[ns].groupScores[key]) state[ns].groupScores[key] = {home:'', away:''};
         state[ns].groupScores[key][side] = e.target.value;
         refreshAllStandings(ns);
         updateKnockout(ns);
-        if(ns==='live') renderAutoGoalStats();
+        if(ns==='live'){ renderAutoGoalStats(); scheduleCloudPush(); }
+        else savePredToLocalStorage();
       });
     });
   }
@@ -821,6 +1002,7 @@
             '<button type="button" class="pbtn" id="'+uid+'-pen-B" data-ns="'+ns+'" data-match="'+m.id+'" data-side="B">—</button>' +
           '</div>' +
         '</div>' +
+        (ns==='live' ? '<button type="button" class="kmatch-clear-btn" data-ns="'+ns+'" data-match="'+m.id+'">🗑 Borrar resultado de este cruce</button>' : '') +
         (ns==='live' ? adminBlockHtml('K-'+m.id, '<option value="">Aún no definido</option>') : '');
       container.appendChild(card);
     });
@@ -835,20 +1017,24 @@
     document.querySelectorAll('#'+ns+'-playoffs .kscore, #tab-'+ns+' .kscore').forEach(inp=>{
       inp.addEventListener('input', function(e){
         const matchId = e.target.dataset.match, side = e.target.dataset.side, ens = e.target.dataset.ns;
+        if(ens==='live' && !isAdmin) return;
         if(!state[ens].koScores[matchId]) state[ens].koScores[matchId] = {home:'', away:'', penalty:null};
         if(side==='A') state[ens].koScores[matchId].home = e.target.value; else state[ens].koScores[matchId].away = e.target.value;
         updateKnockout(ens);
-        if(ens==='live') renderAutoGoalStats();
+        if(ens==='live'){ renderAutoGoalStats(); scheduleCloudPush(); }
+        else savePredToLocalStorage();
       });
     });
 
     document.querySelectorAll('#'+ns+'-playoffs .pbtn, #tab-'+ns+' .pbtn').forEach(btn=>{
       btn.addEventListener('click', function(e){
         const matchId = e.target.dataset.match, ens = e.target.dataset.ns;
+        if(ens==='live' && !isAdmin) return;
         const side = e.target.dataset.side;
         if(!state[ens].koScores[matchId]) state[ens].koScores[matchId] = {home:'', away:'', penalty:null};
         state[ens].koScores[matchId].penalty = side;
         updateKnockout(ens);
+        if(ens==='live') flushCloudPush(); else savePredToLocalStorage();
       });
     });
   }
@@ -927,10 +1113,11 @@
       if(teamB && teamB.flag){ flagB.src = flagUrl(teamB.flag); flagB.alt = teamB.name; flagB.style.display = 'inline-block'; }
       else { flagB.style.display = 'none'; }
 
+      const lockedForViewer = (ns === 'live' && typeof isAdmin !== 'undefined' && !isAdmin);
       sideA.classList.toggle('pending', !teamA);
       sideB.classList.toggle('pending', !teamB);
-      scoreA.disabled = !(teamA && teamB);
-      scoreB.disabled = !(teamA && teamB);
+      scoreA.disabled = !(teamA && teamB) || lockedForViewer;
+      scoreB.disabled = !(teamA && teamB) || lockedForViewer;
 
       sideA.classList.remove('winner','loser');
       sideB.classList.remove('winner','loser');
@@ -1000,25 +1187,57 @@
     });
 
     const finalRes = results['F1'];
-    const semis = [results['S1'], results['S2']];
     html += '<div class="cc-podium">';
     if(finalRes && finalRes.winner){
       const champ = finalRes.winner;
-      const runnerUp = finalRes.winner.side==='A' ? finalRes.teamB : finalRes.teamA;
-      html += '<div class="cc-place champ"><div class="cctag">🏆 Campeón</div><div class="ccname">'+champ.name+'</div><div class="ccowner">'+champ.owner+'</div></div>';
-      if(runnerUp){
-        html += '<div class="cc-place"><div class="cctag">🥈 Subcampeón</div><div class="ccname">'+runnerUp.name+'</div><div class="ccowner">'+runnerUp.owner+'</div></div>';
-      }
-      const semiLosers = semis.map(s=> s && s.winner ? (s.winner.side==='A' ? s.teamB : s.teamA) : null).filter(Boolean);
-      if(semiLosers.length){
-        html += '<div class="cc-place"><div class="cctag">🥉 Semifinalistas</div><div class="ccname">'+semiLosers.map(t=>t.name).join(' · ')+'</div></div>';
-      }
+      html += '<div class="cc-place champ"><div class="cctag">🏆 Equipo Ganador</div><div class="ccname">'+champ.name+'</div><div class="ccowner">'+champ.owner+'</div></div>';
     } else {
-      html += '<div class="cc-place"><div class="cctag">Torneo en curso</div><div class="ccname">Completa la Gran Final para conocer al campeón</div></div>';
+      html += '<div class="cc-place"><div class="cctag">Torneo en curso</div><div class="ccname">Completa la Gran Final para conocer al ganador</div></div>';
     }
     html += '</div>';
 
     cc.innerHTML = html;
+  }
+
+  /* ---------------- MI PREDICCIÓN: guardado local + carga rápida ---------------- */
+  const PRED_STORAGE_KEY = 'torneoMundialCampeones_pred_v1';
+
+  function savePredToLocalStorage(){
+    try{ localStorage.setItem(PRED_STORAGE_KEY, JSON.stringify(state.pred)); }
+    catch(e){ console.warn('No se pudo guardar tu predicción en este navegador.', e); }
+  }
+
+  function loadPredFromLocalStorage(){
+    try{
+      const raw = localStorage.getItem(PRED_STORAGE_KEY);
+      if(raw){
+        const parsed = JSON.parse(raw);
+        if(parsed && typeof parsed === 'object'){
+          state.pred.groupScores = parsed.groupScores || {};
+          state.pred.koScores = parsed.koScores || {};
+        }
+      }
+    }catch(e){ console.warn('No se pudo cargar tu predicción guardada.', e); }
+    syncNsInputsFromState('pred');
+  }
+
+  function setupPredLoadButton(){
+    const btn = document.getElementById('loadLiveBtn');
+    if(!btn) return;
+    btn.addEventListener('click', function(){
+      const hasLiveData = Object.keys(state.live.groupScores).length || Object.keys(state.live.koScores).length;
+      if(!hasLiveData){
+        alert('Todavía no hay resultados registrados en "En Directo". En cuanto el administrador cargue algún marcador, podrás traerlo aquí.');
+        return;
+      }
+      if(!confirm('Esto sustituirá tus marcadores actuales de "Mi Predicción" por los resultados reales ya jugados en "En Directo". Los partidos que aún no se han jugado los podrás seguir pronosticando tú. ¿Continuar?')) return;
+      state.pred.groupScores = JSON.parse(JSON.stringify(state.live.groupScores));
+      state.pred.koScores = JSON.parse(JSON.stringify(state.live.koScores));
+      syncNsInputsFromState('pred');
+      refreshAllStandings('pred');
+      updateKnockout('pred');
+      savePredToLocalStorage();
+    });
   }
 
   /* ---------------- DOWNLOAD AS IMAGE (Mi Predicción) ---------------- */
@@ -1133,8 +1352,21 @@
       highlightCard('🛡️', 'Equipo Menos Goleador', least, least.goals+' goles');
   }
 
+  /* ---------------- ADMIN: bloqueo de edición para no-administradores ---------------- */
+  function applyAdminLock(){
+    document.querySelectorAll('#tab-live input.score-input').forEach(function(inp){
+      inp.disabled = !isAdmin;
+    });
+    document.querySelectorAll('#tab-live .score-clear-btn, #tab-live .kmatch-clear-btn').forEach(function(btn){
+      btn.disabled = !isAdmin;
+    });
+    // Re-evalúa el estado disabled de los marcadores de eliminatorias
+    // combinando "equipos ya definidos" + "modo admin".
+    if(typeof updateKnockout === 'function') updateKnockout('live');
+  }
+
   /* ---------------- ADMIN: autenticación ---------------- */
-  const ADMIN_PASSWORD = 'admin123';
+  const ADMIN_PASSWORD = 'cordoba2214';
   let isAdmin = false;
 
   function setupAdminAuth(){
@@ -1148,6 +1380,7 @@
       statusText.textContent = isAdmin ? '✅ Administrador activo' : '';
       toggleBtn.textContent = isAdmin ? '🔓 Cerrar sesión' : '🔐 Modo Administrador';
       document.body.classList.toggle('admin-mode', isAdmin);
+      applyAdminLock();
     }
 
     function tryLogin(){
@@ -1180,21 +1413,68 @@
   }
 
   /* ---------------- ADMIN: estadísticas por partido (solo "En Directo") ---------------- */
-  const ADMIN_STORAGE_KEY = 'torneoAdminStats';
   const adminStats = { matches: {} }; // matches[matchKey] = [{team, owner, player, goals, assists, yellow, red}]
 
-  function loadAdminStats(){
-    try{
-      const raw = localStorage.getItem(ADMIN_STORAGE_KEY);
-      if(raw){
-        const parsed = JSON.parse(raw);
-        if(parsed && typeof parsed === 'object') adminStats.matches = parsed;
-      }
-    }catch(e){ console.warn('No se pudieron cargar las estadísticas guardadas.', e); }
+  /* ---------------- MOTOR DE SINCRONIZACIÓN: recolectar / aplicar / enviar ---------------- */
+  let cloudPushTimer = null;
+
+  function collectLivePayload(){
+    return {
+      groupScores: state.live.groupScores,
+      koScores: state.live.koScores,
+      playerStats: adminStats.matches,
+      updatedAt: Date.now()
+    };
   }
-  function saveAdminStats(){
-    try{ localStorage.setItem(ADMIN_STORAGE_KEY, JSON.stringify(adminStats.matches)); }
-    catch(e){ console.warn('No se pudieron guardar las estadísticas.', e); }
+
+  function scheduleCloudPush(){
+    clearTimeout(cloudPushTimer);
+    cloudPushTimer = setTimeout(flushCloudPush, 500);
+  }
+
+  function flushCloudPush(){
+    clearTimeout(cloudPushTimer);
+    LiveStore.write(collectLivePayload());
+  }
+
+  // Vuelca los valores guardados en state[ns] a los <input> ya construidos,
+  // sin tocar el campo que se esté escribiendo ahora mismo (para no
+  // interrumpir a quien esté tecleando).
+  function syncNsInputsFromState(ns){
+    document.querySelectorAll('#tab-'+ns+' .score-input').forEach(function(inp){
+      if(document.activeElement === inp) return;
+      const key = inp.dataset.key, side = inp.dataset.side;
+      const sc = state[ns].groupScores[key];
+      const val = (sc && sc[side] != null) ? sc[side] : '';
+      if(inp.value !== String(val)) inp.value = val;
+    });
+    ALL_KO_MATCHES.forEach(function(m){
+      const uid = ns+'-'+m.id;
+      const scoreA = document.getElementById(uid+'-A-score');
+      const scoreB = document.getElementById(uid+'-B-score');
+      const sc = state[ns].koScores[m.id] || {home:'', away:''};
+      if(scoreA && document.activeElement !== scoreA && scoreA.value !== String(sc.home||'')) scoreA.value = sc.home || '';
+      if(scoreB && document.activeElement !== scoreB && scoreB.value !== String(sc.away||'')) scoreB.value = sc.away || '';
+    });
+  }
+
+  // Se llama cada vez que llegan datos nuevos desde la nube (o localStorage
+  // en modo local), ya sea al cargar la página o porque otro usuario editó algo.
+  function applyRemoteLiveData(data){
+    if(!data) return;
+    state.live.groupScores = data.groupScores || {};
+    state.live.koScores = data.koScores || {};
+    adminStats.matches = data.playerStats || {};
+    syncNsInputsFromState('live');
+    refreshAllStandings('live');
+    updateKnockout('live');
+    renderAllMatchAdminEntries();
+    renderPlayerLeaderboards();
+    renderAutoGoalStats();
+  }
+
+  function initCloudSync(){
+    LiveStore.init(applyRemoteLiveData);
   }
 
   function renderMatchAdminEntries(matchKey){
@@ -1211,7 +1491,7 @@
       return '<li>' +
         '<span class="ae-who">'+e.player+'<small>'+e.team+'</small></span>' +
         '<span>'+parts.join(' ')+'</span>' +
-        '<button type="button" class="ap-del" data-matchkey="'+matchKey+'" data-idx="'+idx+'" title="Eliminar">✕</button>' +
+        '<button type="button" class="ap-del" data-matchkey="'+matchKey+'" data-idx="'+idx+'" title="Eliminar">🗑</button>' +
       '</li>';
     }).join('');
   }
@@ -1222,6 +1502,36 @@
 
   function setupAdminStatsDelegation(){
     document.addEventListener('click', function(e){
+      const clearScoreBtn = e.target.closest('.score-clear-btn');
+      if(clearScoreBtn){
+        if(!isAdmin) return;
+        const ns = clearScoreBtn.dataset.ns, key = clearScoreBtn.dataset.clearkey;
+        state[ns].groupScores[key] = {home:'', away:''};
+        const homeInp = document.querySelector('.score-input[data-key="'+key+'"][data-side="home"][data-ns="'+ns+'"]');
+        const awayInp = document.querySelector('.score-input[data-key="'+key+'"][data-side="away"][data-ns="'+ns+'"]');
+        if(homeInp) homeInp.value = '';
+        if(awayInp) awayInp.value = '';
+        refreshAllStandings(ns);
+        updateKnockout(ns);
+        renderAutoGoalStats();
+        flushCloudPush();
+        return;
+      }
+      const clearKoBtn = e.target.closest('.kmatch-clear-btn');
+      if(clearKoBtn){
+        if(!isAdmin) return;
+        const ns = clearKoBtn.dataset.ns, matchId = clearKoBtn.dataset.match;
+        state[ns].koScores[matchId] = {home:'', away:'', penalty:null};
+        const uid = ns+'-'+matchId;
+        const scoreA = document.getElementById(uid+'-A-score');
+        const scoreB = document.getElementById(uid+'-B-score');
+        if(scoreA) scoreA.value = '';
+        if(scoreB) scoreB.value = '';
+        updateKnockout(ns);
+        renderAutoGoalStats();
+        flushCloudPush();
+        return;
+      }
       const toggleBtn = e.target.closest('.admin-match-btn');
       if(toggleBtn){
         const panel = document.getElementById('admin-panel-'+toggleBtn.dataset.matchkey);
@@ -1230,6 +1540,7 @@
       }
       const addBtn = e.target.closest('.ap-add-btn');
       if(addBtn){
+        if(!isAdmin) return;
         const key = addBtn.dataset.matchkey;
         const teamSel = document.getElementById('ap-team-'+key);
         const playerInput = document.getElementById('ap-player-'+key);
@@ -1249,20 +1560,21 @@
         if(!adminStats.matches[key]) adminStats.matches[key] = [];
         adminStats.matches[key].push({ team, owner, player, goals, assists, yellow, red });
         playerInput.value = ''; goalsInput.value = '0'; assistsInput.value = '0'; yellowInput.value = '0'; redInput.value = '0';
-        saveAdminStats();
         renderMatchAdminEntries(key);
         renderPlayerLeaderboards();
+        flushCloudPush();
         return;
       }
       const delBtn = e.target.closest('.ap-del');
       if(delBtn){
+        if(!isAdmin) return;
         const key = delBtn.dataset.matchkey;
         const idx = Number(delBtn.dataset.idx);
         if(adminStats.matches[key]){
           adminStats.matches[key].splice(idx,1);
-          saveAdminStats();
           renderMatchAdminEntries(key);
           renderPlayerLeaderboards();
+          flushCloudPush();
         }
       }
     });
@@ -1328,14 +1640,17 @@
 
   /* ---------------- INIT ---------------- */
   function init(){
-    loadAdminStats();
     ['live','pred'].forEach(function(ns){
       buildGroups(ns);
       buildKnockout(ns);
       refreshAllStandings(ns);
       updateKnockout(ns);
     });
+    loadPredFromLocalStorage();
+    refreshAllStandings('pred');
+    updateKnockout('pred');
     setupDownload();
+    setupPredLoadButton();
     initTabs();
     setupAdminAuth();
     setupAdminStatsDelegation();
@@ -1343,6 +1658,8 @@
     renderAutoGoalStats();
     renderPlayerLeaderboards();
     buildHallOfFame();
+    applyAdminLock();
+    initCloudSync();
   }
 
   document.addEventListener('DOMContentLoaded', init);
