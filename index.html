@@ -1350,7 +1350,7 @@
       highlightCard('🛡️', 'Equipo Menos Goleador', least, least.goals+' goles');
   }
 
-  /* ---------------- ADMIN: bloqueo de edición para no-administradores ---------------- */
+  /* ---------------- ADMIN: bloqueo de edición para no administradores ---------------- */
   function applyAdminLock(){
     document.querySelectorAll('#tab-live input.score-input').forEach(function(inp){
       inp.disabled = !isAdmin;
