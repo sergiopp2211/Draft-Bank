@@ -539,7 +539,7 @@
     </div>
 
     <div class="cloud-banner" id="cloudBanner">
-      ⚠ <strong>Modo local (sin sincronización global):</strong> este navegador no tiene configurada la base de datos en la nube, así que los cambios solo se guardan en este dispositivo. Abre el código fuente y rellena el objeto <code>firebaseConfig</code> con los datos de tu proyecto gratuito de Firebase (ver instrucciones en el comentario junto a <code>firebaseConfig</code>) para que todos los usuarios vean los mismos resultados al instante.
+      ⚠ <strong>Modo local (sin sincronización global):</strong> no se ha podido conectar con la base de datos en la nube (revisa tu conexión a internet, que no haya un bloqueador de anuncios/extensión impidiendo cargar <code>gstatic.com</code>, y que las reglas de tu Realtime Database permitan lectura/escritura). Mientras tanto, los cambios solo se guardan en este dispositivo.
     </div>
 
     <section class="block" id="live-grupos">
@@ -679,49 +679,47 @@
 <div class="clean-capture" id="predCleanCapture"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" onerror="window.__h2cLoadFailed = true;"></script>
-<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js" onerror="window.__fbLoadFailed = true;"></script>
-<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js" onerror="window.__fbLoadFailed = true;"></script>
-<script>
+<script type="module">
+// Importa Firebase (SDK modular v10)
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
+import { getDatabase, ref, set, onValue } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js';
+// Nota: de tu snippet original quité 'get' y 'child' porque esta app no los usa
+// (todo se lee mediante 'onValue', que sí necesitamos para la sincronización en
+// tiempo real), y añadí 'onValue' por ese mismo motivo.
 (function(){
   "use strict";
 
   /* =====================================================================
-     SINCRONIZACIÓN EN LA NUBE (Firebase Realtime Database — capa gratuita)
+     SINCRONIZACIÓN EN LA NUBE (Firebase Realtime Database)
      =====================================================================
-     PASOS PARA ACTIVARLA (5 minutos, sin tarjeta de crédito):
-       1. Ve a https://console.firebase.google.com y crea un proyecto nuevo
-          (plan gratuito "Spark").
-       2. En el menú lateral entra en "Compilación" → "Realtime Database"
-          → "Crear base de datos". Elige la ubicación y arranca en
-          "modo de prueba" (permite lectura/escritura pública durante 30
-          días; luego, en la pestaña "Reglas", puedes dejar simplemente:
-             { "rules": { ".read": true, ".write": true } }
-          — es una app privada de amigos, no maneja datos sensibles).
-       3. En "Configuración del proyecto" (icono ⚙) → "General" → baja
-          hasta "Tus apps" → pulsa el icono </> para añadir una app web.
-          Copia el objeto de configuración que te da Firebase.
-       4. Pega esos valores AQUÍ ABAJO, sustituyendo el objeto de ejemplo.
-       5. Guarda el archivo y súbelo a GitHub. ¡Listo! Todos los que abran
-          la web verán y editarán los mismos datos en tiempo real.
-     Si dejas los valores de ejemplo tal cual, la app sigue funcionando
-     con normalidad pero en "modo local": solo se guarda en este navegador
-     (verás un aviso ámbar arriba de la pestaña "En Directo").
+     Conectado a tu proyecto "draft-bank" con tus credenciales exactas,
+     incluida tu databaseURL:
+       https://draft-bank-default-rtdb.firebaseio.com
+
+     Solo falta un paso en la consola de Firebase (si no lo has hecho ya):
+     en Realtime Database → pestaña "Reglas", deja esto para que cualquier
+     usuario pueda leer y escribir sin necesidad de iniciar sesión (es una
+     app privada de amigos, sin datos sensibles):
+       { "rules": { ".read": true, ".write": true } }
+     Si las reglas se quedan en el modo de prueba por defecto, funcionará
+     igual durante 30 días y luego se bloqueará la escritura — por eso
+     conviene dejarlas así de forma permanente.
   ===================================================================== */
   const firebaseConfig = {
-    apiKey: "YOUR_API_KEY_HERE",
-    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-    databaseURL: "https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT_ID.appspot.com",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
+    apiKey: 'AIzaSyAr0qfT30vdTI0dHjdHjDsEnW9KGuSub69Z6c',
+    authDomain: 'draft-bank.firebaseapp.com',
+    databaseURL: 'https://draft-bank-default-rtdb.firebaseio.com',
+    projectId: 'draft-bank',
+    storageBucket: 'draft-bank.firebasestorage.app',
+    messagingSenderId: '986221469100',
+    appId: '1:986221469100:web:e1f8c1dc0fd71535d36e09',
+    measurementId: 'G-YGTZ76S3DY'
   };
   const CLOUD_PATH = 'torneoMundialCampeones/live';
-  const CLOUD_ENABLED = firebaseConfig.apiKey && firebaseConfig.apiKey.indexOf('YOUR_API_KEY') === -1;
+  const CLOUD_ENABLED = !!(firebaseConfig.databaseURL && firebaseConfig.databaseURL.indexOf('PON_AQUI') === -1);
 
   let cloudDbRef = null;
   let cloudReady = false;
-  let suppressNextLocalEcho = false;
 
   function setCloudStatus(mode, text){
     const badge = document.getElementById('cloudStatus');
@@ -742,18 +740,35 @@
   const LOCAL_FALLBACK_KEY = 'torneoMundialCampeones_live_v1';
   const LiveStore = {
     init(onData){
-      if(CLOUD_ENABLED && typeof firebase !== 'undefined'){
+      if(CLOUD_ENABLED){
         try{
-          firebase.initializeApp(firebaseConfig);
-          cloudDbRef = firebase.database().ref(CLOUD_PATH);
+          const app = initializeApp(firebaseConfig);
+          const db = getDatabase(app);
+          cloudDbRef = ref(db, CLOUD_PATH);
           setCloudStatus('local', 'Conectando…');
-          cloudDbRef.on('value', function(snap){
+          // Si en 7s no hemos recibido respuesta de Firebase (típico si la
+          // página se abre dentro de una vista previa/sandbox que bloquea
+          // conexiones salientes, o si hay un firewall/extensión de por
+          // medio), avisamos con un mensaje claro en vez de dejar
+          // "Conectando…" colgado para siempre. El listener sigue activo:
+          // si la conexión llega más tarde, el estado se actualiza solo.
+          const connectTimeout = setTimeout(function(){
+            if(!cloudReady){
+              setCloudStatus('err', 'Sin respuesta de la nube — abre el archivo fuera de esta vista previa');
+              showCloudBanner(true);
+            }
+          }, 7000);
+          onValue(cloudDbRef, function(snap){
+            clearTimeout(connectTimeout);
             cloudReady = true;
             setCloudStatus('ok', 'Sincronizado en la nube');
+            showCloudBanner(false);
             onData(snap.val());
           }, function(err){
+            clearTimeout(connectTimeout);
             console.error('Firebase error:', err);
-            setCloudStatus('err', 'Error de conexión — reintentando');
+            setCloudStatus('err', 'Error de conexión: ' + (err && err.message ? err.message : 'revisa las reglas de tu base de datos'));
+            showCloudBanner(true);
           });
         }catch(err){
           console.error('No se pudo iniciar Firebase:', err);
@@ -762,7 +777,7 @@
           this._initLocalOnly(onData);
         }
       } else {
-        setCloudStatus('local', 'Modo local (sin nube configurada)');
+        setCloudStatus('local', 'Modo local (falta databaseURL en firebaseConfig)');
         showCloudBanner(true);
         this._initLocalOnly(onData);
       }
@@ -779,7 +794,7 @@
     },
     write(data){
       if(CLOUD_ENABLED && cloudDbRef){
-        cloudDbRef.set(data).catch(function(err){
+        set(cloudDbRef, data).catch(function(err){
           console.error('Error guardando en la nube:', err);
           setCloudStatus('err', 'No se pudo guardar — revisa tu conexión');
         });
@@ -1511,6 +1526,14 @@
         const awayInp = document.querySelector('.score-input[data-key="'+key+'"][data-side="away"][data-ns="'+ns+'"]');
         if(homeInp) homeInp.value = '';
         if(awayInp) awayInp.value = '';
+        // También borramos las estadísticas de jugadores (goles, asistencias,
+        // amarillas, rojas) que se hubieran registrado para este partido —
+        // si no, quedaban "huérfanas" en el marcador de estadísticas.
+        if(ns==='live' && adminStats.matches[key]){
+          delete adminStats.matches[key];
+          renderMatchAdminEntries(key);
+          renderPlayerLeaderboards();
+        }
         refreshAllStandings(ns);
         updateKnockout(ns);
         renderAutoGoalStats();
@@ -1527,6 +1550,15 @@
         const scoreB = document.getElementById(uid+'-B-score');
         if(scoreA) scoreA.value = '';
         if(scoreB) scoreB.value = '';
+        // Las estadísticas de jugadores de un cruce de eliminatorias se
+        // guardan bajo la clave "K-<idPartido>" (ver adminBlockHtml). Hay
+        // que borrarlas también al borrar el resultado del cruce.
+        const statsKey = 'K-'+matchId;
+        if(ns==='live' && adminStats.matches[statsKey]){
+          delete adminStats.matches[statsKey];
+          renderMatchAdminEntries(statsKey);
+          renderPlayerLeaderboards();
+        }
         updateKnockout(ns);
         renderAutoGoalStats();
         flushCloudPush();
