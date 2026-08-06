@@ -423,8 +423,18 @@
   .cc-stage{ margin-bottom:18px; }
   .cc-stage h4{ font-family:'Cinzel',serif; font-size:11px; letter-spacing:0.14em; color:var(--gold-dim); text-transform:uppercase; margin:0 0 8px; border-bottom:1px solid var(--panel-line); padding-bottom:5px; }
   .cc-row{ display:flex; align-items:center; justify-content:center; gap:8px; font-size:12.5px; color:var(--text-dim); padding:4px 0; text-align:center; }
+  .cc-row .ccteam{ display:inline-flex; align-items:center; gap:5px; }
   .cc-row .ccw{ color:var(--gold-soft); font-weight:800; }
   .cc-row .ccarrow{ color:var(--gold-dim); font-size:11px; }
+  .cc-flag{ width:16px; height:11px; object-fit:cover; border-radius:2px; box-shadow:0 0 0 1px rgba(212,175,55,0.3); flex-shrink:0; background:var(--panel-alt); }
+  .cc-flag-lg{ width:34px; height:23px; object-fit:cover; border-radius:3px; box-shadow:0 0 0 1px rgba(212,175,55,0.35); margin:6px auto 4px; display:block; background:var(--panel-alt); }
+  .cc-groupwinners{ margin-bottom:22px; }
+  .cc-group-grid{ display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; }
+  .cc-group-item{ border:1px solid var(--panel-line); border-radius:7px; padding:8px 4px 9px; text-align:center; background:var(--panel); }
+  .cc-group-tag{ display:block; font-family:'Cinzel',serif; font-size:9px; letter-spacing:0.1em; color:var(--gold-dim); text-transform:uppercase; margin-bottom:3px; }
+  .cc-group-team{ display:block; font-size:11px; font-weight:700; color:var(--text); line-height:1.2; }
+  .cc-group-team.pending{ color:var(--text-faint); font-weight:500; font-style:italic; font-size:10px; margin-top:4px; }
+  .cc-group-owner{ display:block; font-size:9.5px; color:var(--text-faint); margin-top:1px; }
   .cc-podium{ margin-top:26px; display:flex; flex-direction:column; gap:10px; }
   .cc-place{ border:1px solid var(--panel-line); border-radius:8px; padding:12px 14px; text-align:center; background:var(--panel); }
   .cc-place.champ{ border-color:var(--gold); box-shadow:0 0 24px rgba(212,175,55,0.18); }
@@ -1083,12 +1093,17 @@ import { getDatabase, ref, set, onValue } from 'https://www.gstatic.com/firebase
         h = Number(sc.home); a = Number(sc.away);
         if(!Number.isNaN(h) && !Number.isNaN(a)){
           hasScores = true;
-          if(h>a) winner = Object.assign({side:'A'}, teamA);
-          else if(a>h) winner = Object.assign({side:'B'}, teamB);
+          // IMPORTANTE: 'side' debe ir al final del Object.assign. teamA/teamB pueden ser
+          // el objeto "winner" de una ronda anterior (ya trae su propio campo .side de
+          // aquel cruce), así que si lo ponemos primero, esa propiedad vieja pisa el 'A'/'B'
+          // que corresponde a ESTE partido y el resaltado de ganador queda desincronizado
+          // del marcador (y del cartel de campeón, que sí usa .name correctamente).
+          if(h>a) winner = Object.assign({}, teamA, {side:'A'});
+          else if(a>h) winner = Object.assign({}, teamB, {side:'B'});
           else {
             tied = true;
-            if(sc.penalty==='A') winner = Object.assign({side:'A'}, teamA);
-            else if(sc.penalty==='B') winner = Object.assign({side:'B'}, teamB);
+            if(sc.penalty==='A') winner = Object.assign({}, teamA, {side:'A'});
+            else if(sc.penalty==='B') winner = Object.assign({}, teamB, {side:'B'});
           }
         }
       }
@@ -1098,7 +1113,7 @@ import { getDatabase, ref, set, onValue } from 'https://www.gstatic.com/firebase
   }
 
   function updateKnockout(ns){
-    const { results } = computeKnockoutResults(ns);
+    const { results, standingsByGroup } = computeKnockoutResults(ns);
 
     ALL_KO_MATCHES.forEach(m=>{
       const uid = ns+'-'+m.id;
@@ -1173,27 +1188,47 @@ import { getDatabase, ref, set, onValue } from 'https://www.gstatic.com/firebase
       banner.classList.remove('show');
     }
 
-    if(ns === 'pred') buildCleanSummary(results);
+    if(ns === 'pred') buildCleanSummary(results, standingsByGroup);
   }
 
   /* ---------------- CLEAN SUMMARY (prediction download) ---------------- */
+  function ccTeamSpan(team, isWinner){
+    if(!team) return '<span class="ccteam">Pendiente</span>';
+    const flagImg = team.flag ? '<img class="cc-flag" src="'+flagUrl(team.flag)+'" alt="" crossorigin="anonymous">' : '';
+    return '<span class="ccteam'+(isWinner?' ccw':'')+'">'+flagImg+'<span>'+team.name+'</span></span>';
+  }
+
   function ccRow(r){
-    const aName = r.teamA ? r.teamA.name : 'Pendiente';
-    const bName = r.teamB ? r.teamB.name : 'Pendiente';
     const aWin = r.winner && r.winner.side==='A';
     const bWin = r.winner && r.winner.side==='B';
     return '<div class="cc-row">' +
-      '<span class="'+(aWin?'ccw':'')+'">'+aName+'</span>' +
+      ccTeamSpan(r.teamA, aWin) +
       '<span class="ccarrow">vs</span>' +
-      '<span class="'+(bWin?'ccw':'')+'">'+bName+'</span>' +
+      ccTeamSpan(r.teamB, bWin) +
     '</div>';
   }
 
-  function buildCleanSummary(results){
+  function buildCleanSummary(results, standingsByGroup){
     const cc = document.getElementById('predCleanCapture');
     let html = '<div class="cc-eyebrow">Mi Predicción · Torneo Mundial de Campeones</div>' +
       '<div class="cc-title">Resumen Final</div>' +
       '<div class="cc-divider"></div>';
+
+    if(standingsByGroup){
+      html += '<div class="cc-stage cc-groupwinners"><h4>Ganadores de Grupo</h4><div class="cc-group-grid">';
+      groupsData.forEach(g=>{
+        const winner = standingsByGroup[g.id] && standingsByGroup[g.id][0];
+        html += '<div class="cc-group-item">' +
+          '<span class="cc-group-tag">GRUPO '+g.id+'</span>' +
+          (winner ? (
+            '<img class="cc-flag-lg" src="'+flagUrl(winner.flag)+'" alt="'+winner.name+'" crossorigin="anonymous">' +
+            '<span class="cc-group-team">'+winner.name+'</span>' +
+            '<span class="cc-group-owner">'+winner.owner+'</span>'
+          ) : '<span class="cc-group-team pending">Por definir</span>') +
+        '</div>';
+      });
+      html += '</div></div>';
+    }
 
     ['previa','cuartos','semis','final'].forEach(stageKey=>{
       html += '<div class="cc-stage"><h4>'+STAGE_LABELS[stageKey]+'</h4>';
@@ -1205,7 +1240,8 @@ import { getDatabase, ref, set, onValue } from 'https://www.gstatic.com/firebase
     html += '<div class="cc-podium">';
     if(finalRes && finalRes.winner){
       const champ = finalRes.winner;
-      html += '<div class="cc-place champ"><div class="cctag">🏆 Equipo Ganador</div><div class="ccname">'+champ.name+'</div><div class="ccowner">'+champ.owner+'</div></div>';
+      const champFlag = champ.flag ? '<img class="cc-flag-lg" src="'+flagUrl(champ.flag)+'" alt="'+champ.name+'" crossorigin="anonymous">' : '';
+      html += '<div class="cc-place champ"><div class="cctag">🏆 Equipo Ganador</div>'+champFlag+'<div class="ccname">'+champ.name+'</div><div class="ccowner">'+champ.owner+'</div></div>';
     } else {
       html += '<div class="cc-place"><div class="cctag">Torneo en curso</div><div class="ccname">Completa la Gran Final para conocer al ganador</div></div>';
     }
