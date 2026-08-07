@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DRAFT BANK · Hall de la Fama</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="portal.css">
+</head>
+<body>
+<script>
+  (function(){
+    try{
+      var saved = localStorage.getItem('tema-preferido');
+      if(saved === 'light'){ document.documentElement.setAttribute('data-theme', 'light'); }
+    }catch(e){}
+  })();
+</script>
+
+<div class="portal-bar">
+  <div class="portal-bar-inner">
+    <a class="portal-brand" href="index.html" aria-label="DRAFT BANK Inicio">
+      <span class="pb-mark">DB</span>
+      <span class="pb-name">DRAFT BANK</span>
+    </a>
+    <nav class="portal-nav">
+      <a href="index.html"><span class="pn-home">🏠</span>Inicio</a>
+      <a href="mundial.html"><span class="pn-dot"></span>Mundial</a>
+      <a href="primera.html"><span class="pn-dot"></span>Primera División</a>
+      <a href="segunda.html"><span class="pn-dot"></span>Segunda División</a>
+      <a href="copa.html"><span class="pn-dot"></span>Copa</a>
+      <a href="hall-de-la-fama.html" class="active"><span class="pn-dot"></span>Hall de la Fama</a>
+    </nav>
+  </div>
+</div>
+
+<div class="hero">
+  <button type="button" class="theme-toggle-btn" id="themeToggleBtn">
+    <span class="icon" id="themeToggleIcon">🌙</span><span id="themeToggleLabel">Modo Oscuro</span>
+  </button>
+  <div class="eyebrow">DRAFT BANK · Salón de la Fama</div>
+  <h1>HALL DE LA FAMA</h1>
+  <div class="sub">Las leyendas eternas del portal, clasificadas por competición y temporada: logo, dueño, puesto, año y color de borde.</div>
+  <div class="divider"></div>
+</div>
+
+<div class="app">
+  <div class="admin-bar">
+    <button class="admin-toggle-btn" id="adminToggleBtn">🔐 Modo Administrador</button>
+    <div class="admin-login" id="adminLogin">
+      <input type="password" id="adminPasswordInput" placeholder="Contraseña">
+      <button class="admin-login-btn" id="adminSubmitBtn">Entrar</button>
+    </div>
+    <button class="admin-toggle-btn" id="colorSettingsBtn" style="display:none;">🎨 Color</button>
+    <span class="admin-status" id="adminStatusText"></span>
+    <span class="cloud-status" id="cloudStatus" style="margin-left:auto;"><span class="dot"></span><span id="cloudStatusText">Conectando…</span></span>
+    <div class="color-settings-panel" id="colorSettingsPanel">
+      <label for="accentPreview">Color de acento (bordes)</label>
+      <input type="color" id="accentPreview" value="#f2f2f2">
+    </div>
+  </div>
+
+  <div class="cloud-banner" id="cloudBanner">
+    ⚠ <strong>Modo local (sin sincronización global):</strong> no se ha podido conectar con la base de datos en la nube (revisa tu conexión a internet, que no haya un bloqueador de anuncios/extensión impidiendo cargar <code>gstatic.com</code>, y que las reglas de tu Realtime Database permitan lectura/escritura). Mientras tanto, los cambios solo se guardan en este dispositivo.
+  </div>
+
+  <section class="block">
+    <div class="block-title"><span class="idx">I.</span><h2>Salón de la Fama</h2><span class="rule"></span></div>
+    <p class="block-note">Cada entrada lleva nombre, dueño, logo, competición, temporada, puesto/año y color de borde. Se clasifican por competición y temporada, y se muestran también en la "Vitrina Histórica" de cada competición.</p>
+
+    <div class="teams-admin-toolbar teams-admin-form fame-admin-form">
+      <div class="tf-field"><label>Nombre</label><input type="text" id="hfName" placeholder="Ej. Equipo Legendario"></div>
+      <div class="tf-field"><label>Dueño</label><input type="text" id="hfOwner" placeholder="Ej. Juan"></div>
+      <div class="tf-field"><label>Competición</label>
+        <select id="hfComp">
+          <option value="">General</option>
+          <option value="mundial">Mundial</option>
+          <option value="primera">Primera División</option>
+          <option value="segunda">Segunda División</option>
+          <option value="copa">Copa</option>
+        </select>
+      </div>
+      <div class="tf-field"><label>Temporada</label><input type="text" id="hfSeason" placeholder="ej. 2025-26"></div>
+      <div class="tf-field"><label>Puesto / Año</label><input type="text" id="hfYear" placeholder="ej. 1º · 2026"></div>
+      <div class="tf-field tf-flag"><label>Color de borde</label><input type="color" id="hfColor" value="#f2f2f2"></div>
+      <div class="tf-field hf-logo-field"><label>Logo (URL o subir)</label>
+        <div class="hf-logo-row">
+          <input type="text" id="hfLogoUrl" placeholder="https://… (opcional)">
+          <label class="cal-upload hf-upload"><input type="file" accept="image/*" id="hfLogoFile">📷</label>
+        </div>
+      </div>
+      <button type="button" class="rn-add-btn" id="hfAddBtn">+ Añadir leyenda</button>
+    </div>
+
+    <div class="fame-grid" id="fameGrid"></div>
+  </section>
+</div>
+
+<div id="toast-container"></div>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
+<script>
+  window.DRAFT_FIREBASE = {
+    apiKey: 'AIzaSyAr0qfT30vdTI0dHjdHjDsEnW9KGuSub69Z6c',
+    authDomain: 'draft-bank.firebaseapp.com',
+    databaseURL: 'https://draft-bank-default-rtdb.firebaseio.com',
+    projectId: 'draft-bank',
+    storageBucket: 'draft-bank.firebasestorage.app',
+    messagingSenderId: '986221469100',
+    appId: '1:986221469100:web:e1f8c1dc0fd71535d36e09',
+    measurementId: 'G-YGTZ76S3DY'
+  };
+</script>
+<script src="portal.js"></script>
+<script>
+(function(){
+  "use strict";
+  var KEY_ENTRIES = 'draftbank_hallfame_v1';
+  var KEY_SETTINGS = 'draftbank_hallfame_settings_v1';
+  var CLOUD_ROOT = 'draftbank/hallFame';
+  var ADMIN_PASSWORD = 'cordoba2214';
+  var DEFAULT_ACCENT = '#f2f2f2';
+  var isAdmin = false;
+  var _app = null, _db = null, _storage = null;
+
+  function notificar(m){ if(window.mostrarNotificacion) window.mostrarNotificacion(m); }
+  function escapeHtml(s){ return String(s==null?'':s).replace(/[&<>"']/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]; }); }
+  function lsGet(k, d){ try{ var r = localStorage.getItem(k); return r ? JSON.parse(r) : d; }catch(e){ return d; } }
+  function lsSet(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+
+  var entries = lsGet(KEY_ENTRIES, []);
+  var settings = lsGet(KEY_SETTINGS, {});
+
+  function CLOUD_ENABLED(){ return !!(window.firebase && window.DRAFT_FIREBASE && window.DRAFT_FIREBASE.databaseURL && window.DRAFT_FIREBASE.databaseURL.indexOf('PON_AQUI') === -1); }
+  function getDb(){
+    if(!CLOUD_ENABLED()) return null;
+    try{
+      if(!_app){
+        var existing = null;
+        for(var i=0;i<window.firebase.apps.length;i++){
+          if(window.firebase.apps[i].name === 'draftbank-hall'){ existing = window.firebase.apps[i]; break; }
+        }
+        _app = existing || window.firebase.initializeApp(window.DRAFT_FIREBASE, 'draftbank-hall');
+      }
+      if(!_db) _db = window.firebase.database(_app);
+      return _db;
+    }catch(err){ console.error('Firebase error:', err); return null; }
+  }
+  function getStorage(){
+    if(!CLOUD_ENABLED() || !window.firebase || !window.firebase.storage) return null;
+    try{
+      getDb();
+      if(!_storage) _storage = _app ? window.firebase.storage(_app) : window.firebase.storage();
+      return _storage;
+    }catch(err){ console.error('Storage error:', err); return null; }
+  }
+  function setCloudStatus(mode, text){
+    var badge = document.getElementById('cloudStatus');
+    var label = document.getElementById('cloudStatusText');
+    if(badge) badge.className = 'cloud-status ' + mode;
+    if(label) label.textContent = text;
+  }
+  function showCloudBanner(show){
+    var b = document.getElementById('cloudBanner');
+    if(b) b.classList.toggle('show', show);
+  }
+
+  function hexToRgb(hex){
+    var h = String(hex || '').replace('#','').trim();
+    if(h.length === 3) h = h.split('').map(function(c){ return c+c; }).join('');
+    if(!/^[0-9a-fA-F]{6}$/.test(h)) return { r:242, g:242, b:242 };
+    var n = parseInt(h, 16);
+    return { r:(n>>16)&255, g:(n>>8)&255, b:n&255 };
+  }
+  function mixHex(hex, other, t){
+    var a = hexToRgb(hex), b = hexToRgb(other);
+    return '#'+((1<<24)+(Math.round(a.r+(b.r-a.r)*t)<<16)+(Math.round(a.g+(b.g-a.g)*t)<<8)+Math.round(a.b+(b.b-a.b)*t)).toString(16).slice(1);
+  }
+  function applyAccent(hex, persist){
+    var accent = hex || settings.accent || DEFAULT_ACCENT;
+    var rgb = hexToRgb(accent);
+    var root = document.documentElement;
+    if(root && root.style){
+      root.style.setProperty('--gold', accent);
+      root.style.setProperty('--gold-soft', mixHex(accent, '#ffffff', 0.45));
+      root.style.setProperty('--gold-dim', mixHex(accent, '#000000', 0.5));
+      root.style.setProperty('--panel-line', 'rgba('+rgb.r+','+rgb.g+','+rgb.b+',0.16)');
+    }
+    var input = document.getElementById('accentPreview');
+    if(input && input.value !== accent) input.value = accent;
+    if(persist && accent !== settings.accent){
+      settings.accent = accent;
+      lsSet(KEY_SETTINGS, settings);
+      pushSettings();
+    }
+  }
+  function pushSettings(){
+    var db = getDb();
+    if(db) db.ref(CLOUD_ROOT + '/settings').set(settings).catch(function(e){ console.error(e); });
+  }
+  function pushEntries(){
+    var db = getDb();
+    if(db) db.ref(CLOUD_ROOT + '/entries').set(entries).catch(function(e){ console.error(e); });
+  }
+  function saveEntries(){ lsSet(KEY_ENTRIES, entries); pushEntries(); }
+
+  var COMP_LABELS = { mundial:'🌍 Mundial', primera:'🏆 Primera División', segunda:'🏆 Segunda División', copa:'🏅 Copa', '':'⭐ General' };
+
+  function fameCards(e, i, htmlForList){
+    var rank = i===0?'🥇':(i===1?'🥈':'🥉');
+    var html = '<div class="fame-card fame-top" style="border-color:'+escapeHtml(e.color||'#f2f2f2')+'">' +
+      '<div class="fc-rank">'+rank+'</div>' +
+      (e.logo ? '<div class="fc-logo"><img src="'+escapeHtml(e.logo)+'" alt=""></div>' : '<div class="fc-logo fc-logo-none">🛡️</div>') +
+      '<div class="fc-name">'+escapeHtml(e.nombre||'')+'</div>' +
+      (e.dueño ? '<div class="fc-owner">'+escapeHtml(e.dueño)+'</div>' : '') +
+      (e.puesto != null ? '<div class="fc-year">Puesto #'+escapeHtml(e.puesto)+(e.anno ? ' · '+escapeHtml(e.anno) : '')+'</div>' : '') +
+      (e.season ? '<div class="fc-year">📅 '+escapeHtml(e.season)+'</div>' : '') +
+      (isAdmin ? '<div class="fc-actions"><button type="button" class="fame-edit" data-hf-edit="'+entries.indexOf(e)+'">✏️</button><button type="button" class="fame-del" data-hf-del="'+entries.indexOf(e)+'">🗑</button></div>' : '') +
+    '</div>';
+    return html;
+  }
+
+  function groupedEntries(){
+    var map = {};
+    entries.forEach(function(e){
+      var k = (e.comp || '') + '\u0000' + (e.season || '');
+      if(!map[k]) map[k] = { comp: e.comp || '', season: e.season || '', items: [] };
+      map[k].items.push(e);
+    });
+    var groups = Object.keys(map).map(function(k){ return map[k]; });
+    var order = ['mundial','primera','segunda','copa',''];
+    groups.sort(function(a,b){
+      var oa = order.indexOf(a.comp), ob = order.indexOf(b.comp);
+      if(oa !== ob) return oa - ob;
+      return String(b.season).localeCompare(String(a.season));
+    });
+    groups.forEach(function(g){
+      g.items.sort(function(a,b){ return (a.puesto!=null?a.puesto:9999) - (b.puesto!=null?b.puesto:9999); });
+    });
+    return groups;
+  }
+
+  function render(){
+    var host = document.getElementById('fameGrid');
+    if(!host) return;
+    if(!entries.length){
+      host.innerHTML = '<div class="empty-state"><div class="es-icon">🏆</div><div class="es-title">Salón de la Fama vacío</div><p class="es-text">Activa el <strong>Modo Administrador</strong> y añade la primera leyenda con su logo, competición, temporada y color de borde.</p></div>';
+      return;
+    }
+    var html = '';
+    groupedEntries().forEach(function(g){
+      var compLabel = COMP_LABELS[g.comp] || escapeHtml(g.comp);
+      html += '<div class="fame-group"><div class="fame-group-head"><span class="fg-comp">'+compLabel+'</span>'+(g.season ? '<span class="fg-season">Temporada '+escapeHtml(g.season)+'</span>' : '')+'</div>';
+      var podium = g.items.slice(0,3);
+      var rest = g.items.slice(3);
+      html += '<div class="fame-podium">';
+      podium.forEach(function(e, i){ html += fameCards(e, i); });
+      html += '</div>';
+      if(rest.length){
+        html += '<div class="fame-list">' + rest.map(function(e){
+          return '<div class="fame-row" style="border-color:'+escapeHtml(e.color||'#f2f2f2')+'">' +
+            (e.logo ? '<div class="fr-logo"><img src="'+escapeHtml(e.logo)+'" alt=""></div>' : '<div class="fr-logo fr-logo-none">🛡️</div>') +
+            '<span class="fr-name">'+escapeHtml(e.nombre||'')+'</span>' +
+            (e.dueño ? '<span class="fr-owner">'+escapeHtml(e.dueño)+'</span>' : '') +
+            (e.puesto != null ? '<span class="fr-year">#'+escapeHtml(e.puesto)+(e.anno?' · '+escapeHtml(e.anno):'')+'</span>' : '') +
+            (e.season ? '<span class="fr-year">📅 '+escapeHtml(e.season)+'</span>' : '') +
+            (isAdmin ? '<span class="fr-actions"><button type="button" class="fame-edit" data-hf-edit="'+entries.indexOf(e)+'">✏️</button><button type="button" class="fame-del" data-hf-del="'+entries.indexOf(e)+'">🗑</button></span>' : '') +
+          '</div>';
+        }).join('') + '</div>';
+      }
+      html += '</div>';
+    });
+    host.innerHTML = html;
+  }
+
+  function readPuesto(year){
+    if(!year) return { puesto:null, anno:'' };
+    var m = String(year).match(/(\d+)[º°]?/);
+    var puesto = m ? Number(m[1]) : null;
+    var annoM = String(year).match(/\b(19\d{2}|20\d{2})\b/);
+    var anno = annoM ? annoM[1] : '';
+    return { puesto: puesto, anno: anno };
+  }
+
+  function addOrEdit(idx){
+    var name = (document.getElementById('hfName').value || '').trim();
+    if(!name){ notificar('⚠️ Escribe el nombre de la leyenda'); return; }
+    var owner = (document.getElementById('hfOwner').value || '').trim();
+    var year = (document.getElementById('hfYear').value || '').trim();
+    var color = document.getElementById('hfColor').value || '#f2f2f2';
+    var logo = (document.getElementById('hfLogoUrl').value || '').trim();
+    var comp = document.getElementById('hfComp').value || '';
+    var season = (document.getElementById('hfSeason').value || '').trim();
+    var pa = readPuesto(year);
+    var entry = { nombre:name, dueño:owner, logo:logo, color:color, puesto:pa.puesto, anno:pa.anno, comp:comp, season:season };
+    if(idx != null){
+      var old = entries[idx];
+      if(!logo && old && old.logo) entry.logo = old.logo;
+      entries[idx] = entry;
+      notificar('✅ Leyenda actualizada');
+    } else {
+      if(!logo && _pendingLogo) entry.logo = _pendingLogo;
+      entries.push(entry);
+      notificar('✅ ' + name + ' entra en el Hall de la Fama');
+    }
+    _pendingLogo = null;
+    document.getElementById('hfName').value = '';
+    document.getElementById('hfOwner').value = '';
+    document.getElementById('hfYear').value = '';
+    document.getElementById('hfColor').value = '#f2f2f2';
+    document.getElementById('hfLogoUrl').value = '';
+    document.getElementById('hfComp').value = '';
+    document.getElementById('hfSeason').value = '';
+    saveEntries();
+    render();
+  }
+
+  var _pendingLogo = null;
+
+  function uploadLogo(file, cb){
+    var storage = getStorage();
+    if(!storage){ notificar('⚠️ No se pudo conectar con el almacenamiento en la nube'); return; }
+    var pid = 'logo'+Date.now()+'_'+Math.random().toString(36).slice(2,6);
+    var ref = storage.ref(CLOUD_ROOT + '/logos/' + pid);
+    notificar('⬆️ Subiendo logo…');
+    ref.put(file).then(function(snap){ return snap.ref.getDownloadURL(); })
+      .then(function(url){
+        _pendingLogo = url;
+        document.getElementById('hfLogoUrl').value = url;
+        notificar('✅ Logo listo (clic en "Añadir leyenda" para guardar)');
+      })
+      .catch(function(err){
+        console.error(err);
+        notificar('❌ No se pudo subir el logo' + (err && err.message ? ': '+err.message : ''));
+      });
+  }
+
+  function setupAdmin(){
+    var toggleBtn = document.getElementById('adminToggleBtn');
+    var login = document.getElementById('adminLogin');
+    var pwInput = document.getElementById('adminPasswordInput');
+    var submitBtn = document.getElementById('adminSubmitBtn');
+    var statusText = document.getElementById('adminStatusText');
+
+    function setAdmin(v){
+      isAdmin = v;
+      toggleBtn.textContent = isAdmin ? '🔓 Cerrar sesión' : '🔐 Modo Administrador';
+      if(statusText) statusText.textContent = isAdmin ? '✅ Administrador activo' : '';
+      document.body.classList.toggle('admin-mode', isAdmin);
+      if(login) login.classList.toggle('show', !isAdmin);
+      render();
+    }
+
+    toggleBtn.addEventListener('click', function(){
+      if(isAdmin){ setAdmin(false); notificar('🔒 Sesión de administrador cerrada'); }
+      else { if(login) login.classList.toggle('show'); }
+    });
+
+    function tryLogin(){
+      if(pwInput.value === ADMIN_PASSWORD){
+        setAdmin(true);
+        notificar('🔓 Bienvenido, administrador');
+        if(login) login.classList.remove('show');
+        pwInput.value = '';
+      } else {
+        notificar('❌ Contraseña incorrecta');
+      }
+    }
+    submitBtn.addEventListener('click', tryLogin);
+    pwInput.addEventListener('keydown', function(e){ if(e.key==='Enter') tryLogin(); });
+    setAdmin(false);
+  }
+
+  function setup(){
+    document.getElementById('hfAddBtn').addEventListener('click', function(){ addOrEdit(null); });
+    document.getElementById('hfLogoFile').addEventListener('change', function(e){
+      var f = e.target.files && e.target.files[0];
+      if(f) uploadLogo(f);
+      e.target.value = '';
+    });
+    var grid = document.getElementById('fameGrid');
+    grid.addEventListener('click', function(e){
+      var del = e.target.closest('[data-hf-del]');
+      var edit = e.target.closest('[data-hf-edit]');
+      if(del){
+        if(!isAdmin){ notificar('🔒 Activa el Modo Administrador'); return; }
+        var i = Number(del.getAttribute('data-hf-del'));
+        if(!confirm('¿Sacar a "'+entries[i].nombre+'" del Hall de la Fama?')) return;
+        entries.splice(i, 1);
+        saveEntries();
+        render();
+        notificar('🗑 Leyenda eliminada');
+      } else if(edit){
+        if(!isAdmin){ notificar('🔒 Activa el Modo Administrador'); return; }
+        var e = entries[Number(edit.getAttribute('data-hf-edit'))];
+        document.getElementById('hfName').value = e.nombre || '';
+        document.getElementById('hfOwner').value = e.dueño || '';
+        document.getElementById('hfYear').value = (e.puesto != null ? e.puesto+'º' : '') + (e.anno ? ' · '+e.anno : '');
+        document.getElementById('hfColor').value = e.color || '#f2f2f2';
+        document.getElementById('hfLogoUrl').value = e.logo || '';
+        document.getElementById('hfComp').value = e.comp || '';
+        document.getElementById('hfSeason').value = e.season || '';
+        notificar('✏️ Editando: cambia lo que necesites y pulsa "Añadir leyenda"');
+      }
+    });
+
+    var colorBtn = document.getElementById('colorSettingsBtn');
+    colorBtn.addEventListener('click', function(){
+      document.getElementById('colorSettingsPanel').classList.toggle('show');
+    });
+    var accentInput = document.getElementById('accentPreview');
+    accentInput.addEventListener('input', function(){ applyAccent(accentInput.value, false); });
+    accentInput.addEventListener('change', function(){ applyAccent(accentInput.value, true); notificar('🎨 Color de acento actualizado en la nube'); });
+  }
+
+  function initCloud(){
+    var db = getDb();
+    if(!db){
+      if(window.addEventListener){
+        window.addEventListener('storage', function(e){
+          if(e.key === KEY_ENTRIES){ try{ entries = e.newValue ? JSON.parse(e.newValue) : []; render(); }catch(err){} }
+        });
+      }
+      setCloudStatus('local', 'Guardado en este dispositivo');
+      return;
+    }
+    setCloudStatus('ok', 'Sincronizado en la nube');
+    db.ref(CLOUD_ROOT + '/entries').on('value', function(snap){
+      var v = snap.val();
+      if(v && Array.isArray(v)){
+        entries = v;
+        lsSet(KEY_ENTRIES, entries);
+        render();
+      }
+    }, function(err){ setCloudStatus('err', 'Error de conexión con la nube'); showCloudBanner(true); });
+    db.ref(CLOUD_ROOT + '/settings').on('value', function(snap){
+      var v = snap.val();
+      if(v && typeof v === 'object'){
+        settings = v;
+        lsSet(KEY_SETTINGS, settings);
+        applyAccent();
+      }
+    }, function(err){});
+  }
+
+  setupAdmin();
+  setup();
+  applyAccent();
+  initCloud();
+  render();
+})();
+</script>
+</body>
+</html>

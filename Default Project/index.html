@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DRAFT BANK — Portal General</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="portal.css">
+</head>
+<body>
+<script>
+  (function(){
+    try{
+      var saved = localStorage.getItem('tema-preferido');
+      if(saved === 'light'){ document.documentElement.setAttribute('data-theme', 'light'); }
+    }catch(e){}
+  })();
+</script>
+
+<div class="portal-bar">
+  <div class="portal-bar-inner">
+    <a class="portal-brand" href="index.html" aria-label="DRAFT BANK Inicio">
+      <span class="pb-mark">DB</span>
+      <span class="pb-name">DRAFT BANK</span>
+    </a>
+    <nav class="portal-nav">
+      <a href="index.html" class="active"><span class="pn-home">🏠</span>Inicio</a>
+      <a href="mundial.html"><span class="pn-dot"></span>Mundial</a>
+      <a href="primera.html"><span class="pn-dot"></span>Primera División</a>
+      <a href="segunda.html"><span class="pn-dot"></span>Segunda División</a>
+      <a href="copa.html"><span class="pn-dot"></span>Copa</a>
+      <a href="hall-de-la-fama.html"><span class="pn-dot"></span>Hall de la Fama</a>
+    </nav>
+  </div>
+</div>
+
+<button type="button" class="theme-toggle-btn" id="themeToggleBtn">
+  <span class="icon" id="themeToggleIcon">🌙</span><span id="themeToggleLabel">Modo Oscuro</span>
+</button>
+
+<header class="hall-hero">
+  <div class="eyebrow">Portal General · Central de Competiciones</div>
+  <h1>DRAFT BANK</h1>
+  <p class="sub">El Hall central. Elige una competición y entra a gestionarla.</p>
+  <div class="divider"></div>
+</header>
+
+<main class="hall">
+  <section class="hall-grid">
+
+    <a class="hall-card" href="mundial.html">
+      <div class="hc-icon">🏆</div>
+      <div class="hc-title">Mundial</div>
+      <p class="hc-desc">El torneo insignia: 6 grupos, eliminatorias, partido por el 3er y 4º puesto y la gran final.</p>
+      <div class="hc-strip"><span class="hc-chip">En Directo</span><span class="hc-chip">Mi Predicción</span><span class="hc-chip">Plantillas</span></div>
+      <span class="hc-cta">Entrar <span class="hc-arrow">→</span></span>
+    </a>
+
+    <a class="hall-card" href="primera.html">
+      <div class="hc-icon">⚽</div>
+      <div class="hc-title">Primera División</div>
+      <p class="hc-desc">Tu competición de élite. Crea los equipos, añade los resultados y sigue la tabla en directo.</p>
+      <div class="hc-strip"><span class="hc-chip">Crea tus equipos</span><span class="hc-chip">Tabla en directo</span></div>
+      <span class="hc-cta">Entrar <span class="hc-arrow">→</span></span>
+    </a>
+
+    <a class="hall-card" href="segunda.html">
+      <div class="hc-icon">📊</div>
+      <div class="hc-title">Segunda División</div>
+      <p class="hc-desc">El ascenso manda aquí. Gestiona tu plantilla de equipos y compite por el trono.</p>
+      <div class="hc-strip"><span class="hc-chip">Crea tus equipos</span><span class="hc-chip">Tabla en directo</span></div>
+      <span class="hc-cta">Entrar <span class="hc-arrow">→</span></span>
+    </a>
+
+    <a class="hall-card" href="copa.html">
+      <div class="hc-icon">🥇</div>
+      <div class="hc-title">Copa</div>
+      <p class="hc-desc">El torneo del KO: rondas a partido único, tanda de penaltis y un solo campeón.</p>
+      <div class="hc-strip"><span class="hc-chip">Eliminatorias</span><span class="hc-chip">Con exentos</span></div>
+      <span class="hc-cta">Entrar <span class="hc-arrow">→</span></span>
+    </a>
+
+    <a class="hall-card" href="hall-de-la-fama.html">
+      <div class="hc-icon">🏅</div>
+      <div class="hc-title">Hall de la Fama</div>
+      <p class="hc-desc">Las leyendas del portal: entradas con logo, dueño, puesto y año, con su color de borde.</p>
+      <div class="hc-strip"><span class="hc-chip">Solo admin</span><span class="hc-chip">Sincronizado en la nube</span></div>
+      <span class="hc-cta">Entrar <span class="hc-arrow">→</span></span>
+    </a>
+
+  </section>
+
+  <p class="hall-notes">
+    <strong>DRAFT BANK</strong> · Cada competición guarda sus propios datos de forma separada en tu navegador (localStorage), así nunca se mezclan.
+    Para editar datos de una competición entra en ella y usa el <strong>Modo Administrador</strong>.
+  </p>
+</main>
+
+<div id="toast-container"></div>
+<script src="portal.js"></script>
+</body>
+</html>

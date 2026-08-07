@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DRAFT BANK · Copa</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="portal.css">
+</head>
+<body>
+<script>
+  (function(){
+    try{
+      var saved = localStorage.getItem('tema-preferido');
+      if(saved === 'light'){ document.documentElement.setAttribute('data-theme', 'light'); }
+    }catch(e){}
+  })();
+</script>
+
+<div class="portal-bar">
+  <div class="portal-bar-inner">
+    <a class="portal-brand" href="index.html" aria-label="DRAFT BANK Inicio">
+      <span class="pb-mark">DB</span>
+      <span class="pb-name">DRAFT BANK</span>
+    </a>
+    <nav class="portal-nav">
+      <a href="index.html"><span class="pn-home">🏠</span>Inicio</a>
+      <a href="mundial.html"><span class="pn-dot"></span>Mundial</a>
+      <a href="primera.html"><span class="pn-dot"></span>Primera División</a>
+      <a href="segunda.html"><span class="pn-dot"></span>Segunda División</a>
+      <a href="copa.html" class="active"><span class="pn-dot"></span>Copa</a>
+      <a href="hall-de-la-fama.html"><span class="pn-dot"></span>Hall de la Fama</a>
+    </nav>
+  </div>
+</div>
+
+<div class="hero">
+  <button type="button" class="theme-toggle-btn" id="themeToggleBtn">
+    <span class="icon" id="themeToggleIcon">🌙</span><span id="themeToggleLabel">Modo Oscuro</span>
+  </button>
+  <div class="eyebrow" data-tkey="hero-eyebrow">DRAFT BANK · Torneo de Eliminación</div>
+  <h1 data-tkey="hero-title">COPA</h1>
+  <div class="sub" data-tkey="hero-sub">Eliminatoria directa a partido único hasta la gran final</div>
+  <div class="divider"></div>
+</div>
+
+<nav class="tabnav">
+  <div class="tabnav-inner">
+    <button class="tab-btn active" data-tab="live"><span class="tnum">1</span> <span data-tkey="tab-live">En Directo</span></button>
+    <button class="tab-btn" data-tab="pred"><span class="tnum">2</span> <span data-tkey="tab-pred">Mi Predicción</span></button>
+    <button class="tab-btn" data-tab="teams"><span class="tnum">3</span> <span data-tkey="tab-teams">Equipos</span></button>
+    <button class="tab-btn" data-tab="squads"><span class="tnum">4</span> <span data-tkey="tab-squads">Plantillas</span></button>
+    <button class="tab-btn" data-tab="calendar"><span class="tnum">5</span> <span data-tkey="tab-calendar">Calendario</span></button>
+    <button class="tab-btn" data-tab="stats"><span class="tnum">6</span> <span data-tkey="tab-stats">Estadísticas y Extras</span></button>
+    <button class="tab-btn" data-tab="fame"><span class="tnum">7</span> <span data-tkey="tab-fame">Vitrina Histórica</span></button>
+    <button class="tab-btn" data-tab="rulesnews"><span class="tnum">8</span> <span data-tkey="tab-rulesnews">Normativa</span></button>
+  </div>
+</nav>
+
+<div class="app">
+
+  <!-- ======================= TAB 1: EN DIRECTO ======================= -->
+  <div class="tab-panel active" id="tab-live">
+    <div class="admin-bar">
+      <button class="admin-toggle-btn" id="adminToggleBtn">🔐 Modo Administrador</button>
+      <div class="admin-login" id="adminLogin">
+        <input type="password" id="adminPasswordInput" placeholder="Contraseña">
+        <button class="admin-login-btn" id="adminSubmitBtn">Entrar</button>
+      </div>
+      <button class="admin-toggle-btn" id="editTextsBtn" style="display:none;">✏️ Editar Textos</button>
+      <button class="admin-toggle-btn" id="colorSettingsBtn" style="display:none;">🎨 Color</button>
+      <span class="admin-status" id="adminStatusText"></span>
+      <span class="cloud-status" id="cloudStatus" style="margin-left:auto;"><span class="dot"></span><span id="cloudStatusText">Conectando…</span></span>
+      <div class="color-settings-panel" id="colorSettingsPanel">
+        <label for="accentPreview">Color de acento (bordes)</label>
+        <input type="color" id="accentPreview" value="#d4af37">
+      </div>
+    </div>
+
+    <div class="cloud-banner" id="cloudBanner">
+      ⚠ <strong>Modo local (sin sincronización global):</strong> no se ha podido conectar con la base de datos en la nube (revisa tu conexión a internet, que no haya un bloqueador de anuncios/extensión impidiendo cargar <code>gstatic.com</code>, y que las reglas de tu Realtime Database permitan lectura/escritura). Mientras tanto, los cambios solo se guardan en este dispositivo.
+    </div>
+
+    <section class="block" id="live-copa">
+      <div class="block-title"><span class="idx">I.</span><h2 data-tkey="bt-1">Cuadro de la Copa — En Directo</h2><span class="rule"></span></div>
+      <p class="block-note" data-tkey="bn-1">Introduce los goles reales de cada cruce. El ganador avanza; en caso de empate se define por penaltis. Los equipos exentos pasan de ronda automáticamente.</p>
+      <div id="live-koRounds"></div>
+      <div class="trophy-banner" id="live-trophyBanner"></div>
+    </section>
+  </div>
+
+  <!-- ======================= TAB 2: MI PREDICCIÓN ======================= -->
+  <div class="tab-panel" id="tab-pred">
+    <section class="block" id="pred-copa">
+      <div class="block-title"><span class="idx">I.</span><h2 data-tkey="bt-2">Mi Predicción — Cuadro</h2><span class="rule"></span></div>
+      <p class="block-note" data-tkey="bn-2">Simula tu propia copa. Estos resultados son solo tuyos y no afectan al torneo en directo. Se guardan automáticamente en este navegador.</p>
+
+      <div class="mode-switch" id="koModeSwitch">
+        <button type="button" class="mode-btn active" data-mode="score">⚽ Con marcador (goles)</button>
+        <button type="button" class="mode-btn" data-mode="pick">👆 Elegir ganador directo</button>
+      </div>
+      <p class="block-note mode-hint" id="koModeHint"></p>
+
+      <div class="pred-load-wrap">
+        <button type="button" class="load-live-btn" id="loadLiveBtn">⬇ Cargar resultados actuales en directo</button>
+      </div>
+
+      <div id="pred-koRounds"></div>
+      <div class="trophy-banner" id="pred-trophyBanner"></div>
+
+      <div class="pred-download-wrap">
+        <button class="download-btn reset-btn" id="predResetBtn">🔄 Reiniciar mi predicción</button>
+      </div>
+    </section>
+  </div>
+
+  <!-- ======================= TAB 3: EQUIPOS ======================= -->
+  <div class="tab-panel" id="tab-teams">
+    <section class="block">
+      <div class="block-title"><span class="idx">II.</span><h2 data-tkey="bt-3">Gestión de Equipos</h2><span class="rule"></span></div>
+      <p class="block-note" data-tkey="bn-3">Añade y borra equipos libremente. El cuadro se genera solo con el número de equipos que tengas (los necesarios pasan directos). Todo se guarda automáticamente en este navegador (localStorage), de forma separada del resto de competiciones.</p>
+
+      <p class="teams-admin-note">🔒 Activa el Modo Administrador (pestaña "En Directo") para añadir o eliminar equipos.</p>
+
+      <div class="teams-admin-toolbar teams-admin-form">
+        <div class="tf-field"><label>Equipo</label><input type="text" id="teamNameInput" placeholder="Ej. River Plate"></div>
+        <div class="tf-field"><label>Responsable</label><input type="text" id="teamOwnerInput" placeholder="Ej. Juan"></div>
+        <div class="tf-field tf-flag"><label>Bandera (código o emoji)</label><input type="text" id="teamFlagInput" placeholder="ar · 🇦🇷"></div>
+        <div class="tf-field hf-logo-field"><label>Logo (subir o URL)</label>
+          <div class="hf-logo-row">
+            <input type="text" id="teamLogoUrl" placeholder="https://… (opcional)">
+            <label class="cal-upload hf-upload"><input type="file" accept="image/*" id="teamLogoFile">📷</label>
+          </div>
+        </div>
+        <button type="button" class="rn-add-btn" id="teamAddBtn">+ Añadir equipo</button>
+      </div>
+
+      <div class="teams-admin-toolbar admin-only-toolbar">
+        <button type="button" class="download-btn reset-btn" id="clearLiveBtn">🗑 Borrar resultados en directo</button>
+      </div>
+
+      <div class="teams-list-grid" id="teamsGrid"></div>
+    </section>
+  </div>
+
+  <!-- ======================= TAB 4: PLANTILLAS ======================= -->
+  <div class="tab-panel" id="tab-squads">
+    <section class="block">
+      <div class="block-title"><span class="idx">IV.</span><h2 data-tkey="bt-squads">Plantillas</h2><span class="rule"></span></div>
+      <p class="block-note" data-tkey="bn-squads">Forma la plantilla de cada equipo: fichajes, dorsales, posiciones y traspasos entre equipos.</p>
+      <div id="squadsList"></div>
+      <div id="squadDetail" class="squad-detail"></div>
+      <div id="playerModal" class="player-modal"></div>
+    </section>
+  </div>
+
+  <!-- ======================= TAB 5: CALENDARIO ======================= -->
+  <div class="tab-panel" id="tab-calendar">
+    <section class="block">
+      <div class="block-title"><span class="idx">V.</span><h2 data-tkey="bt-calendar">Calendario</h2><span class="rule"></span></div>
+      <p class="block-note" data-tkey="bn-calendar">Cualquier persona puede subir capturas del resultado de cada partido. Toca una foto para verla ampliada.</p>
+      <div id="calendarList"></div>
+      <div id="lightbox" class="lightbox"></div>
+    </section>
+  </div>
+
+  <!-- ======================= TAB 6: ESTADÍSTICAS Y EXTRAS ======================= -->
+  <div class="tab-panel" id="tab-stats">
+    <section class="block">
+      <div class="block-title"><span class="idx">VI.</span><h2 data-tkey="bt-stats">Estadísticas y Extras</h2><span class="rule"></span></div>
+      <p class="block-note" data-tkey="bn-stats">El administrador registra goles, asistencias, tarjetas y MVP en cada partido desde "En Directo". Aquí se muestra todo el balance.</p>
+      <div id="statsLeaderboards" class="lb-grid"></div>
+      <div id="statsExtras"></div>
+    </section>
+  </div>
+
+  <!-- ======================= TAB 7: VITRINA HISTÓRICA ======================= -->
+  <div class="tab-panel" id="tab-fame">
+    <section class="block">
+      <div class="block-title"><span class="idx">VII.</span><h2 data-tkey="bt-fame">Vitrina Histórica</h2><span class="rule"></span></div>
+      <p class="block-note" data-tkey="bn-fame">Leyendas de la historia de DRAFT BANK, gestionadas desde la página "Hall de la Fama".</p>
+      <div id="fameGrid" class="fame-grid"></div>
+    </section>
+  </div>
+
+  <!-- ======================= TAB 8: NORMATIVA ======================= -->
+  <div class="tab-panel" id="tab-rulesnews">
+    <section class="block">
+      <div class="block-title"><span class="idx">VIII.</span><h2 data-tkey="bt-rules">Normativa</h2><span class="rule"></span></div>
+      <div id="rulesNewsWrap"></div>
+      <div id="rnModal" class="rn-modal"></div>
+    </section>
+  </div>
+
+</div>
+
+<div id="toast-container"></div>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
+<script>
+  window.DRAFT_FIREBASE = {
+    apiKey: 'AIzaSyAr0qfT30vdTI0dHjdHjDsEnW9KGuSub69Z6c',
+    authDomain: 'draft-bank.firebaseapp.com',
+    databaseURL: 'https://draft-bank-default-rtdb.firebaseio.com',
+    projectId: 'draft-bank',
+    storageBucket: 'draft-bank.firebasestorage.app',
+    messagingSenderId: '986221469100',
+    appId: '1:986221469100:web:e1f8c1dc0fd71535d36e09',
+    measurementId: 'G-YGTZ76S3DY'
+  };
+</script>
+<script src="portal.js"></script>
+<script>window.DRAFT_COMP = { id:'copa', nombre:'Copa', modo:'directo' };</script>
+<script>window.DRAFT_ACCENT = '#2f9e63';</script>
+<script src="competencia.js"></script>
+</body>
+</html>
